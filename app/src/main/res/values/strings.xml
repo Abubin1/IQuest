@@ -1,3 +1,33 @@
 <resources>
-    <string name="app_name">IQuest</string>
+    <string name="app_name">Quest App</string>
+
+    <!-- Auth -->
+    <string name="login_hint">Логин</string>
+    <string name="password_hint">Пароль</string>
+    <string name="email_hint">Email</string>
+    <string name="login_button">Войти</string>
+    <string name="register_button">Зарегистрироваться</string>
+    <string name="register_link">Нет аккаунта? Зарегистрируйтесь</string>
+
+    <!-- Profile -->
+    <string name="profile_login">Логин: %s</string>
+    <string name="profile_email">Email: %s</string>
+    <string name="profile_points">Баллы: %d</string>
+    <string name="profile_reg_date">Дата регистрации: %s</string>
+
+    <!-- Events -->
+    <string name="events_title">Мероприятия</string>
+    <string name="event_location">Место: %s</string>
+    <string name="event_date">Дата: %s</string>
+
+    <!-- Navigation -->
+    <string name="menu_events">Мероприятия</string>
+    <string name="menu_profile">Профиль</string>
+
+    <!-- Errors -->
+    <string name="error_network">Ошибка сети</string>
+    <string name="error_auth">Ошибка авторизации</string>
+    <string name="error_register">Ошибка регистрации</string>
+    <string name="error_load_events">Ошибка загрузки мероприятий</string>
+    <string name="error_load_profile">Ошибка загрузки профиля</string>
 </resources>
