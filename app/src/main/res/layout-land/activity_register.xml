@@ -10,37 +10,39 @@
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:text="Регистрация"
-        android:layout_marginTop="250dp"
+        android:layout_marginTop="25dp"
         android:textSize="20sp"/>
 
     <EditText
         android:id="@+id/etLogin"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:hint="Имя пользователя"
+        android:layout_gravity="center"
         android:layout_marginTop="20dp"/>
 
     <EditText
         android:id="@+id/etEmail"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:hint="Email"
+        android:layout_gravity="center"
         android:inputType="textEmailAddress"/>
 
     <EditText
         android:id="@+id/etPassword"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:hint="Пароль"
+        android:layout_gravity="center"
         android:inputType="textPassword"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnRegister"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:text="Зарегистрироваться"
-        android:textAllCaps="false"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"
         style="@style/Widget.MaterialComponents.Button"
-        android:layout_marginTop="8dp"/>
-
+        android:text="Зарегистрироваться"/>
 </LinearLayout>

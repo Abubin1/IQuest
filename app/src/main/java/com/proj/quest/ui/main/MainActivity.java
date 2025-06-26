@@ -1,7 +1,10 @@
 package com.proj.quest.ui.main;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.Window;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +15,7 @@ import com.proj.quest.R;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     private BottomNavigationView bottomNavigationView;
+    private Button createEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        createEvent = findViewById(R.id.create_event);
 
         loadFragment(new EventsFragment());
     }

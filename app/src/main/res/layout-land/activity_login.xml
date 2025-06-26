@@ -10,47 +10,52 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="18sp"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="10dp"
         android:text="Вход в приложение" />
 
     <EditText
         android:id="@+id/etEmail"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"
         android:hint="Email"
-        android:layout_marginTop="10dp"
         android:inputType="textEmailAddress"/>
 
     <EditText
         android:id="@+id/etPassword"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:hint="Пароль"
         android:inputType="textPassword"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogin"
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="Войти"
+        android:layout_gravity="center"
         android:layout_marginTop="10dp"
+        android:text="Войти"
         style="@style/Widget.MaterialComponents.Button"/>
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/btnOfflineMode"
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:text="Войти без"
+        android:layout_gravity="center"
+        android:paddingLeft="30dp"
+        android:paddingEnd="30dp"
         style="@style/Widget.MaterialComponents.Button"/>
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/btnGoToRegister"
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_gravity="center"
+        android:layout_marginBottom="10dp"
         android:text="Регистрация"
-        android:layout_marginTop="330dp"
-        android:layout_alignParentBottom="true"
         style="@style/Widget.MaterialComponents.Button"/>
 
 </LinearLayout>

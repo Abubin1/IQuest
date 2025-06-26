@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/nav_riddles"
+        android:icon="@drawable/riddles"
+        android:title="Загадки"/>
+    <item
+        android:id="@+id/nav_leaders"
+        android:icon="@drawable/leaders"
+        android:title="Таблица лидеров"/>
+    <item
         android:id="@+id/nav_events"
-        android:icon="@drawable/remove"
-        android:title="Мероприятия"/>
+        android:icon="@drawable/home"
+        android:title="Главная страница"/>
+    <item
+        android:id="@+id/nav_groups"
+        android:icon="@drawable/group"
+        android:title="Группы"/>
     <item
         android:id="@+id/nav_profile"
-        android:icon="@drawable/remove"
+        android:icon="@drawable/profile"
         android:title="Профиль"/>
 </menu>
