@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="18sp"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="170dp"
         android:text="Вход в приложение" />
 
     <EditText
@@ -25,6 +25,7 @@
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:hint="Пароль"
         android:inputType="textPassword"/>
 
@@ -41,6 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Войти без"
+        android:layout_marginTop="5dp"
         style="@style/Widget.MaterialComponents.Button"/>
 
     <com.google.android.material.button.MaterialButton
@@ -49,7 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:text="Регистрация"
-        android:layout_marginTop="330dp"
+        android:layout_marginTop="5dp"
         android:layout_alignParentBottom="true"
         style="@style/Widget.MaterialComponents.Button"/>
 

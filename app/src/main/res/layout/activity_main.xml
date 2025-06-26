@@ -9,36 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottom_navigation">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/search_text_input_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Поиск"
-            android:layout_margin="20dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/search_text_input_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:singleLine="true"
-                android:drawableEnd="@drawable/ic_search"
-                android:paddingEnd="28dp"/>
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/create_event"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="15dp"
-            app:backgroundTint="@color/yellow"
-            android:textColor="@color/black"
-            style="@style/Widget.MaterialComponents.Button"
-            android:text="Создать квест" />
     </FrameLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -46,5 +16,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        app:menu="@menu/bottom_nav_menu"/>
+        app:menu="@menu/bottom_nav_menu" />
 </RelativeLayout>
