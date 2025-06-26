@@ -1,9 +1,11 @@
 package com.proj.quest.models;
 
 import java.util.Date;
+import com.google.gson.annotations.SerializedName;
 
 public class Event {
     private int id;
+    @SerializedName("ДатаПроведения")
     private Date eventDate;
     private String startLocation;
     private int teamCount;

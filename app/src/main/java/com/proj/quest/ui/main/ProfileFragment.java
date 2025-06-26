@@ -1,5 +1,6 @@
 package com.proj.quest.ui.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,7 +60,18 @@ public class ProfileFragment extends Fragment {
                         tvLogin.setText(user.getLogin());
                         tvEmail.setText(user.getEmail());
                         tvPoints.setText(String.valueOf(user.getPoints()));
-                        tvRegDate.setText(user.getRegistrationDate().toString());
+                        String regDate = user.getRegistrationDate();
+                        if (regDate != null && !regDate.isEmpty()) {
+                            tvRegDate.setText(regDate.replace('T', ' ').replace(".000Z", ""));
+                        } else {
+                            tvRegDate.setText("Нет данных");
+                        }
+                    } else if (response.code() == 403) {
+                        // Токен истёк или невалиден
+                        sharedPrefs.clear();
+                        Intent intent = new Intent(getContext(), com.proj.quest.ui.auth.LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
                     } else {
                         Toast.makeText(getContext(), "Ошибка загрузки профиля", Toast.LENGTH_SHORT).show();
                     }

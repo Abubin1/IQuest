@@ -1,5 +1,6 @@
 package com.proj.quest.ui.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,6 +63,12 @@ public class EventsFragment extends Fragment {
                 if (isAdded()) { // Проверяем, что фрагмент прикреплен к Activity
                     if (response.isSuccessful() && response.body() != null) {
                         adapter.setEvents(response.body());
+                    } else if (response.code() == 403) {
+                        // Токен истёк или невалиден
+                        sharedPrefs.clear();
+                        Intent intent = new Intent(getContext(), com.proj.quest.ui.auth.LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
                     } else {
                         Toast.makeText(getContext(), "Ошибка загрузки мероприятий", Toast.LENGTH_SHORT).show();
                     }

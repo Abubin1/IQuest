@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.proj.quest.R;
 import com.proj.quest.models.Event;
 
+import java.util.Date;
 import java.util.List;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
@@ -33,7 +34,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event event = events.get(position);
         holder.tvEventName.setText(event.getStartLocation());
-        holder.tvEventDate.setText(event.getEventDate().toString());
+        Date date = event.getEventDate();
+        holder.tvEventDate.setText(date != null ? date.toString() : "Нет даты");
     }
 
     @Override
