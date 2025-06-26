@@ -7,6 +7,7 @@ public class SharedPrefs {
     private static final String PREFS_NAME = "QuestPrefs";
     private static final String KEY_TOKEN = "token";
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
+    private static final String KEY_AVATAR_URL = "avatar_url";
 
     private final SharedPreferences prefs;
 
@@ -28,6 +29,14 @@ public class SharedPrefs {
 
     public boolean isLoggedIn() {
         return prefs.getBoolean(KEY_IS_LOGGED_IN, false);
+    }
+
+    public void saveAvatarUrl(String url) {
+        prefs.edit().putString(KEY_AVATAR_URL, url).apply();
+    }
+
+    public String getAvatarUrl() {
+        return prefs.getString(KEY_AVATAR_URL, "");
     }
 
     public void clear() {

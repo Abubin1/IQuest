@@ -1,6 +1,7 @@
 package com.proj.quest.ui.main;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.Window;
@@ -42,14 +43,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        Fragment fragment = null;
-
         int itemId = item.getItemId();
         if (itemId == R.id.nav_events) {
-            fragment = new EventsFragment();
+            return loadFragment(new EventsFragment());
         } else if (itemId == R.id.nav_profile) {
-            fragment = new ProfileFragment();
+            startActivity(new Intent(this, ProfileActivity.class));
+            overridePendingTransition(0, 0);
+            return false;
         }
-        return loadFragment(fragment);
+        // Добавьте обработку других пунктов меню, если нужно
+        return false;
     }
 }

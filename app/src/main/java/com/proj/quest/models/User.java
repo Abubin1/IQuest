@@ -14,6 +14,8 @@ public class User {
     private int points;
     @SerializedName("ДатаРегистрации")
     private String registrationDate;
+    @SerializedName("avatar_url")
+    private String avatarUrl;
 
     public User() {}
 
@@ -23,6 +25,7 @@ public class User {
     public String getEmail() { return email; }
     public int getPoints() { return points; }
     public String getRegistrationDate() { return registrationDate; }
+    public String getAvatarUrl() { return avatarUrl; }
 
     // Сеттеры
     public void setId(int id) { this.id = id; }
@@ -30,4 +33,5 @@ public class User {
     public void setEmail(String email) { this.email = email; }
     public void setPoints(int points) { this.points = points; }
     public void setRegistrationDate(String registrationDate) { this.registrationDate = registrationDate; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
 }
