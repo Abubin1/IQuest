@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="16dp">
+
+    <!-- Место (позиция) -->
+    <TextView
+        android:id="@+id/positionTextView"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/leaderboard_text"
+        android:textSize="16sp"/>
+
+    <!-- Имя пользователя -->
+    <TextView
+        android:id="@+id/nameTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingStart="16dp"
+        android:textColor="@color/leaderboard_text"
+        android:textSize="16sp"/>
+
+    <!-- Очки -->
+    <TextView
+        android:id="@+id/scoreTextView"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:textColor="@color/leaderboard_text"
+        android:textSize="16sp"/>
+</LinearLayout>

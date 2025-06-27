@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.proj.quest.R;
+import com.proj.quest.leaderboard.LeaderboardActivity;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     private BottomNavigationView bottomNavigationView;
@@ -48,6 +49,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             return loadFragment(new EventsFragment());
         } else if (itemId == R.id.nav_profile) {
             startActivity(new Intent(this, ProfileActivity.class));
+            overridePendingTransition(0, 0);
+            return false;
+        }else if (itemId == R.id.nav_leaders) {
+            startActivity(new Intent(this, LeaderboardActivity.class));
             overridePendingTransition(0, 0);
             return false;
         }

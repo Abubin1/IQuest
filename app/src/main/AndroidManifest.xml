@@ -31,8 +31,11 @@
             android:name=".ui.main.MainActivity"
             android:exported="false">
         </activity>
+
         <activity android:name=".ui.main.ProfileActivity" />
         <activity android:name=".ui.settings.ProfileSettingsActivity" />
+        <activity android:name=".leaderboard.LeaderboardActivity" />
+
     </application>
 
 </manifest>
