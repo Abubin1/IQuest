@@ -2,6 +2,7 @@ package com.proj.quest.leaderboard;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -11,33 +12,75 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.proj.quest.ui.main.MainActivity;
 import com.proj.quest.R;
 import com.proj.quest.ui.main.ProfileActivity;
+import com.proj.quest.api.ApiClient;
+import com.proj.quest.api.ApiService;
+import com.proj.quest.models.User;
 
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LeaderboardActivity extends AppCompatActivity {
+
+    private Handler handler = new Handler();
+    private Runnable leaderboardUpdater;
+    private LeaderboardAdapter adapter;
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard);
 
-        // Инициализация ListView
-        ListView listView = findViewById(R.id.leaderboardListView);
+        listView = findViewById(R.id.leaderboardListView);
+        adapter = new LeaderboardAdapter(this, new java.util.ArrayList<>());
+        listView.setAdapter(adapter);
 
-        // Загрузка данных из файла
-        List<LeaderboardEntry> entries = LeaderboardFileManager.loadLeaderboard(this);
+        ApiService apiService = ApiClient.getApiService();
 
-        // Проверка на пустые данные
-        if (entries == null || entries.isEmpty()) {
-            Toast.makeText(this, "Нет данных о рекордах", Toast.LENGTH_SHORT).show();
-        } else {
-            // Создание и установка адаптера
-            LeaderboardAdapter adapter = new LeaderboardAdapter(this, entries);
-            listView.setAdapter(adapter);
-        }
+        leaderboardUpdater = new Runnable() {
+            @Override
+            public void run() {
+                apiService.getLeaderboard().enqueue(new retrofit2.Callback<List<User>>() {
+                    @Override
+                    public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            List<User> users = response.body();
+                            java.util.List<LeaderboardEntry> entries = new java.util.ArrayList<>();
+                            for (User user : users) {
+                                String avatarUrl = user.getAvatarUrl();
+                                if (avatarUrl != null && avatarUrl.startsWith("/avatars/")) {
+                                    avatarUrl = ApiClient.BASE_URL + avatarUrl.substring(1);
+                                }
+                                entries.add(new LeaderboardEntry(user.getLogin(), user.getPoints(), avatarUrl));
+                            }
+                            adapter.clear();
+                            adapter.addAll(entries);
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            Toast.makeText(LeaderboardActivity.this, "Ошибка загрузки лидеров", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<List<User>> call, Throwable t) {
+                        Toast.makeText(LeaderboardActivity.this, "Ошибка сети: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                handler.postDelayed(this, 30000); // 30 секунд
+            }
+        };
+        leaderboardUpdater.run();
 
         // Настройка нижней навигации
         setupBottomNavigation();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacks(leaderboardUpdater);
     }
 
     private void setupBottomNavigation() {

@@ -14,6 +14,16 @@
         android:textColor="@color/leaderboard_text"
         android:textSize="16sp"/>
 
+    <!-- Аватар пользователя -->
+    <ImageView
+        android:id="@+id/avatarImageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_foreground"
+        android:background="@drawable/circle_mask"/>
+
     <!-- Имя пользователя -->
     <TextView
         android:id="@+id/nameTextView"
