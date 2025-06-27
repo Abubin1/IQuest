@@ -1,0 +1,4 @@
+Anna,75
+Anton,100
+Bob,80
+John,50

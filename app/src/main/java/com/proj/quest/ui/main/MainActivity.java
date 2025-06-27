@@ -1,10 +1,8 @@
 package com.proj.quest.ui.main;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.Window;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -12,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.proj.quest.Group.CreateGroupActivity;
+import com.proj.quest.Group.GroupActivity;
 import com.proj.quest.R;
 import com.proj.quest.leaderboard.LeaderboardActivity;
 
@@ -53,6 +53,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             return false;
         }else if (itemId == R.id.nav_leaders) {
             startActivity(new Intent(this, LeaderboardActivity.class));
+            overridePendingTransition(0, 0);
+            return false;
+        } else if (itemId == R.id.nav_groups) {
+            startActivity(new Intent(this, CreateGroupActivity.class));
             overridePendingTransition(0, 0);
             return false;
         }

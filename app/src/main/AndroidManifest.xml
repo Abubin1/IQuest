@@ -35,6 +35,8 @@
         <activity android:name=".ui.main.ProfileActivity" />
         <activity android:name=".ui.settings.ProfileSettingsActivity" />
         <activity android:name=".leaderboard.LeaderboardActivity" />
+        <activity android:name=".Group.CreateGroupActivity"/>
+        <activity android:name=".Group.GroupActivity"/>
 
     </application>
 
