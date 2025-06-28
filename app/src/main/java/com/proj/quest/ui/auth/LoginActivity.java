@@ -74,8 +74,15 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    sharedPrefs.saveToken(response.body().getToken());
+                    LoginResponse loginResponse = response.body();
+                    sharedPrefs.saveToken(loginResponse.getToken());
                     sharedPrefs.setLoggedIn(true);
+                    
+                    // Сохраняем ID пользователя
+                    if (loginResponse.getUser() != null) {
+                        sharedPrefs.saveUserId(loginResponse.getUser().getId());
+                    }
+                    
                     startMainActivity();
                 } else {
                     Toast.makeText(LoginActivity.this, "Неверный логин или пароль", Toast.LENGTH_SHORT).show();

@@ -14,6 +14,15 @@
         android:orientation="horizontal"
         android:padding="12dp">
 
+        <!-- Аватар пользователя -->
+        <ImageView
+            android:id="@+id/ivParticipantAvatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/profile"
+            android:scaleType="centerCrop"
+            android:layout_marginEnd="12dp" />
+
         <!-- Позиция (цифра) -->
         <TextView
             android:id="@+id/tvPosition"
@@ -27,11 +36,10 @@
 
         <!-- Имя участника -->
         <TextView
-            android:id="@+id/tvName"
+            android:id="@+id/tvParticipantName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="12dp"
             android:layout_marginEnd="8dp"
             android:text=""
             android:textColor="#333333"
@@ -39,13 +47,20 @@
 
         <!-- Количество очков -->
         <TextView
-            android:id="@+id/tvPoints"
+            android:id="@+id/tvParticipantScore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
             android:textColor="#6200EE"
             android:textSize="16sp"
             android:textStyle="bold"/>
+
+        <Button
+            android:id="@+id/btnKick"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Исключить"
+            android:visibility="gone"/>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

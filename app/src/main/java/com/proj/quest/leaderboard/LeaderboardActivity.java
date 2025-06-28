@@ -54,7 +54,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                                 if (avatarUrl != null && avatarUrl.startsWith("/avatars/")) {
                                     avatarUrl = ApiClient.BASE_URL + avatarUrl.substring(1);
                                 }
-                                entries.add(new LeaderboardEntry(user.getLogin(), user.getPoints(), avatarUrl));
+                                entries.add(new LeaderboardEntry(user.getLogin(), user.getScore(), avatarUrl));
                             }
                             adapter.clear();
                             adapter.addAll(entries);

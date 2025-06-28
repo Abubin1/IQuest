@@ -30,7 +30,28 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView.setSelectedItemId(R.id.nav_events);
        // createEvent = findViewById(R.id.create_event);
 
+        // Проверяем, есть ли фрагмент в Intent
+        String fragment = getIntent().getStringExtra("fragment");
+        if (fragment != null && fragment.equals("groups")) {
+            // Если переходим на группы, загружаем GroupsFragment
+            loadFragment(new GroupsFragment());
+            bottomNavigationView.setSelectedItemId(R.id.nav_groups);
+            return;
+        }
+
         loadFragment(new EventsFragment());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        
+        // Обновляем состояние фрагментов при возврате в активность
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (currentFragment instanceof GroupsFragment) {
+            // Если текущий фрагмент - GroupsFragment, обновляем его данные
+            ((GroupsFragment) currentFragment).loadData();
+        }
     }
 
     private boolean loadFragment(Fragment fragment) {
@@ -57,9 +78,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             overridePendingTransition(0, 0);
             return false;
         } else if (itemId == R.id.nav_groups) {
-            startActivity(new Intent(this, CreateGroupActivity.class));
-            overridePendingTransition(0, 0);
-            return false;
+            return loadFragment(new GroupsFragment());
         }else if (itemId == R.id.nav_riddles) {
             startActivity(new Intent(this, RiddleActivity.class));
             overridePendingTransition(0, 0);

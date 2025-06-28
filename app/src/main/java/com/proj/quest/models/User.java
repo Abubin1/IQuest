@@ -11,11 +11,13 @@ public class User {
     @SerializedName("Почта")
     private String email;
     @SerializedName("КоличествоБаллов")
-    private int points;
+    private int score;
     @SerializedName("ДатаРегистрации")
     private String registrationDate;
     @SerializedName("avatar_url")
     private String avatarUrl;
+    @SerializedName("teamId")
+    private Integer teamId;
 
     public User() {}
 
@@ -23,15 +25,17 @@ public class User {
     public int getId() { return id; }
     public String getLogin() { return login; }
     public String getEmail() { return email; }
-    public int getPoints() { return points; }
+    public int getScore() { return score; }
     public String getRegistrationDate() { return registrationDate; }
     public String getAvatarUrl() { return avatarUrl; }
+    public Integer getTeamId() { return teamId; }
 
     // Сеттеры
     public void setId(int id) { this.id = id; }
     public void setLogin(String login) { this.login = login; }
     public void setEmail(String email) { this.email = email; }
-    public void setPoints(int points) { this.points = points; }
+    public void setScore(int score) { this.score = score; }
     public void setRegistrationDate(String registrationDate) { this.registrationDate = registrationDate; }
     public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+    public void setTeamId(Integer teamId) { this.teamId = teamId; }
 }

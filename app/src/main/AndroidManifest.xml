@@ -38,6 +38,8 @@
         <activity android:name=".Group.CreateGroupActivity"/>
         <activity android:name=".Group.GroupActivity"/>
         <activity android:name=".Riddle.RiddleActivity"/>
+        <activity android:name=".ui.main.EventDetailsActivity" />
+
 
     </application>
 

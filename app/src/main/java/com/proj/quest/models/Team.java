@@ -1,23 +1,35 @@
 package com.proj.quest.models;
 
+import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 import java.util.List;
 
-public class Team {
+public class Team implements Serializable {
+    @SerializedName("id")
     private int id;
+    @SerializedName("name")
     private String name;
+    @SerializedName("captainId")
     private int captainId;
-    private int eventId;
-    private List<Integer> members;
+    @SerializedName("members")
+    private List<User> members;
+    private Integer eventId;
+
+    public Team() {}
 
     // Геттеры и сеттеры
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
+    
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    
     public int getCaptainId() { return captainId; }
     public void setCaptainId(int captainId) { this.captainId = captainId; }
-    public int getEventId() { return eventId; }
-    public void setEventId(int eventId) { this.eventId = eventId; }
-    public List<Integer> getMembers() { return members; }
-    public void setMembers(List<Integer> members) { this.members = members; }
+    
+    public Integer getEventId() { return eventId; }
+    public void setEventId(Integer eventId) { this.eventId = eventId; }
+    
+    public List<User> getMembers() { return members; }
+    public void setMembers(List<User> members) { this.members = members; }
 }

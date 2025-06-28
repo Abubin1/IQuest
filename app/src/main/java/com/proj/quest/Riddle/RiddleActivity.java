@@ -58,7 +58,8 @@ public class RiddleActivity extends AppCompatActivity {
                 finish();
                 return true;
             } else if (itemId == R.id.nav_groups) {
-                startActivity(new Intent(this, GroupActivity.class));
+                startActivity(new Intent(this, MainActivity.class)
+                        .putExtra("fragment", "groups"));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;

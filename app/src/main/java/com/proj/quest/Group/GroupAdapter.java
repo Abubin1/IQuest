@@ -4,40 +4,73 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
+import com.bumptech.glide.Glide;
 import com.proj.quest.R;
-
+import com.proj.quest.models.User;
 import java.util.List;
 
-public class GroupAdapter extends ArrayAdapter<GroupEntry> {
+public class GroupAdapter extends BaseAdapter {
+    private final Context context;
+    private final List<User> members;
+    private final int captainId;
+    private final int userId;
+    private final KickListener kickListener;
 
-    public GroupAdapter(@NonNull Context context, @NonNull List<GroupEntry> objects) {
-        super(context, 0, objects);
+    public interface KickListener {
+        void onKick(User user);
     }
 
-    @NonNull
+    public GroupAdapter(Context context, List<User> members, int captainId, int userId, KickListener kickListener) {
+        this.context = context;
+        this.members = members;
+        this.captainId = captainId;
+        this.userId = userId;
+        this.kickListener = kickListener;
+    }
+
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        GroupEntry groupEntry = getItem(position);
+    public int getCount() { return members.size(); }
+    @Override
+    public Object getItem(int i) { return members.get(i); }
+    @Override
+    public long getItemId(int i) { return members.get(i).getId(); }
 
-        if(convertView == null){
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_participant, parent, false);
+    @Override
+    public View getView(int i, View convertView, ViewGroup parent) {
+        View view = convertView;
+        if (view == null) {
+            view = LayoutInflater.from(context).inflate(R.layout.item_participant, parent, false);
         }
-        TextView posView = convertView.findViewById(R.id.tvPosition);
-        TextView nameView = convertView.findViewById(R.id.tvName);
-        TextView scoreView = convertView.findViewById(R.id.tvPoints);
-
-        if(groupEntry != null){
-            posView.setText(String.valueOf(position + 1));
-            nameView.setText(groupEntry.getName());
-            scoreView.setText(String.valueOf(groupEntry.getScore()));
+        User user = members.get(i);
+        TextView tvName = view.findViewById(R.id.tvParticipantName);
+        TextView tvScore = view.findViewById(R.id.tvParticipantScore);
+        ImageView ivAvatar = view.findViewById(R.id.ivParticipantAvatar);
+        Button btnKick = view.findViewById(R.id.btnKick);
+        
+        tvName.setText(user.getLogin());
+        tvScore.setText("Очки: " + user.getScore());
+        
+        // Загружаем аватар
+        if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+            Glide.with(context)
+                .load(user.getAvatarUrl().startsWith("http") ? user.getAvatarUrl() : "http://5.175.92.194:3000" + user.getAvatarUrl())
+                .placeholder(R.drawable.profile)
+                .error(R.drawable.profile)
+                .into(ivAvatar);
+        } else {
+            ivAvatar.setImageResource(R.drawable.profile);
         }
-
-        return convertView;
+        
+        if (captainId == userId && user.getId() != captainId) {
+            btnKick.setVisibility(View.VISIBLE);
+            btnKick.setOnClickListener(v -> kickListener.onKick(user));
+        } else {
+            btnKick.setVisibility(View.GONE);
+        }
+        return view;
     }
 }

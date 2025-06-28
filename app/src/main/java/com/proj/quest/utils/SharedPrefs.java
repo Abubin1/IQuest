@@ -8,6 +8,7 @@ public class SharedPrefs {
     private static final String KEY_TOKEN = "token";
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
     private static final String KEY_AVATAR_URL = "avatar_url";
+    private static final String KEY_USER_ID = "user_id";
 
     private final SharedPreferences prefs;
 
@@ -37,6 +38,14 @@ public class SharedPrefs {
 
     public String getAvatarUrl() {
         return prefs.getString(KEY_AVATAR_URL, "");
+    }
+
+    public void saveUserId(int userId) {
+        prefs.edit().putInt(KEY_USER_ID, userId).apply();
+    }
+
+    public int getUserId() {
+        return prefs.getInt(KEY_USER_ID, -1);
     }
 
     public void clear() {

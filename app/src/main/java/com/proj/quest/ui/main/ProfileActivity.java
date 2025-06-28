@@ -72,7 +72,7 @@ public class ProfileActivity extends AppCompatActivity {
                 finish();
                 return true;
             } else if (itemId == R.id.nav_groups) {
-                startActivity(new Intent(this, GroupActivity.class).putExtra("fragment", "groups"));
+                startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "groups"));
                 overridePendingTransition(0,0);
                 finish();
                 return true;
@@ -125,7 +125,7 @@ public class ProfileActivity extends AppCompatActivity {
                     currentUser = user;
                     tvLogin.setText(user.getLogin());
                     tvEmail.setText(user.getEmail());
-                    tvPoints.setText(String.valueOf(user.getPoints()));
+                    tvPoints.setText(String.valueOf(user.getScore()));
                     String regDate = user.getRegistrationDate();
                     if (regDate != null && !regDate.isEmpty()) {
                         tvRegDate.setText(regDate.replace('T', ' ').replace(".000Z", ""));
