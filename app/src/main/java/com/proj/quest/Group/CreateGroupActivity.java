@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,25 +14,40 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.proj.quest.R;
 import com.proj.quest.leaderboard.LeaderboardActivity;
+import com.proj.quest.models.Team;
 import com.proj.quest.ui.main.EventsFragment;
 import com.proj.quest.ui.main.MainActivity;
 import com.proj.quest.ui.main.ProfileActivity;
 
 public class CreateGroupActivity extends AppCompatActivity {
+    private Button btnCreateGroup;
+    private EditText etNameGroup;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_group);
 
         Button test = findViewById(R.id.btnOfflineGroup);
+        btnCreateGroup = findViewById(R.id.btnCreateGroup);
+        etNameGroup = findViewById(R.id.etNameGroup);
 
         test.setOnClickListener(v->{
             Intent intent = new Intent(this, GroupActivity.class);
             startActivity(intent);
         });
 
+        btnCreateGroup.setOnClickListener(v->{
+            createGroup();
+        });
+
         setupBottomNavigation();
     }
+
+    private void createGroup(){
+    }
+
+
 
     private void setupBottomNavigation() {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);

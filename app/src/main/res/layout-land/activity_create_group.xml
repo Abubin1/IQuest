@@ -21,21 +21,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="30dp"
         android:layout_marginEnd="20dp"
         android:hint="Название группы"
         android:inputType="textEmailAddress" />
-
-    <EditText
-        android:id="@+id/etPasswordGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="77dp"
-        android:layout_marginEnd="20dp"
-        android:hint="Пароль группы"
-        android:inputType="textPassword" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCreateGroup"
@@ -44,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="141dp"
+        android:layout_marginTop="108dp"
         android:layout_marginEnd="30dp"
         android:text="Создать" />
 

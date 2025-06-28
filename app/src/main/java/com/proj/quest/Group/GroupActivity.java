@@ -22,7 +22,7 @@ import com.proj.quest.ui.main.ProfileActivity;
 import java.util.List;
 
 public class GroupActivity extends AppCompatActivity {
-    private Button btn_invent;
+    private Button btn_invent, btn_leaderboardTeams;
     private ListView listView;
     private TextView tvTotalPoints;
 
@@ -32,6 +32,7 @@ public class GroupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_group);
 
         btn_invent = findViewById(R.id.btn_invent);
+        btn_leaderboardTeams = findViewById(R.id.leaderboardTeams);
         listView = findViewById(R.id.users);
         tvTotalPoints = findViewById(R.id.total_points);
 
@@ -49,6 +50,10 @@ public class GroupActivity extends AppCompatActivity {
 
         btn_invent.setOnClickListener(v->{
             showInviteDialog();
+        });
+
+        btn_leaderboardTeams.setOnClickListener(v->{
+            showLeaderboardTeams();
         });
 
         setupBottomNavigation();
@@ -74,6 +79,19 @@ public class GroupActivity extends AppCompatActivity {
             }
         });
 
+        dialog.show();
+    }
+
+    private void showLeaderboardTeams(){
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_team_leaders);
+
+        dialog.setCancelable(true);
+
+        ListView tableTeams = findViewById(R.id.listLeaderboardTeams);
+
+        dialog.findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
+        
         dialog.show();
     }
 
