@@ -13,6 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.proj.quest.Group.CreateGroupActivity;
 import com.proj.quest.Group.GroupActivity;
 import com.proj.quest.R;
+import com.proj.quest.Riddle.RiddleActivity;
 import com.proj.quest.leaderboard.LeaderboardActivity;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -59,7 +60,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             startActivity(new Intent(this, CreateGroupActivity.class));
             overridePendingTransition(0, 0);
             return false;
+        }else if (itemId == R.id.nav_riddles) {
+            startActivity(new Intent(this, RiddleActivity.class));
+            overridePendingTransition(0, 0);
+            return false;
         }
+
         // Добавьте обработку других пунктов меню, если нужно
         return false;
     }

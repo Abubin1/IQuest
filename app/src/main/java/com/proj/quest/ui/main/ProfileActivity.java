@@ -12,9 +12,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.proj.quest.Group.GroupActivity;
 import com.proj.quest.R;
+import com.proj.quest.Riddle.RiddleActivity;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
+import com.proj.quest.leaderboard.LeaderboardActivity;
 import com.proj.quest.models.User;
 import com.proj.quest.ui.auth.LoginActivity;
 import com.proj.quest.ui.settings.ProfileSettingsActivity;
@@ -54,12 +57,12 @@ public class ProfileActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_riddles) {
-                startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "riddles"));
+                startActivity(new Intent(this, RiddleActivity.class).putExtra("fragment", "riddles"));
                 overridePendingTransition(0,0);
                 finish();
                 return true;
             } else if (itemId == R.id.nav_leaders) {
-                startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "leaders"));
+                startActivity(new Intent(this, LeaderboardActivity.class).putExtra("fragment", "leaders"));
                 overridePendingTransition(0,0);
                 finish();
                 return true;
@@ -69,7 +72,7 @@ public class ProfileActivity extends AppCompatActivity {
                 finish();
                 return true;
             } else if (itemId == R.id.nav_groups) {
-                startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "groups"));
+                startActivity(new Intent(this, GroupActivity.class).putExtra("fragment", "groups"));
                 overridePendingTransition(0,0);
                 finish();
                 return true;

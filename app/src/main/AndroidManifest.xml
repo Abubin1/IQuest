@@ -37,6 +37,7 @@
         <activity android:name=".leaderboard.LeaderboardActivity" />
         <activity android:name=".Group.CreateGroupActivity"/>
         <activity android:name=".Group.GroupActivity"/>
+        <activity android:name=".Riddle.RiddleActivity"/>
 
     </application>
 
