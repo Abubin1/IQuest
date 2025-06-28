@@ -20,6 +20,21 @@
     <string name="event_location">Место: %s</string>
     <string name="event_date">Дата: %s</string>
 
+    <!-- Team Member Selection -->
+    <string name="select_team_members_title">Выберите участников команды</string>
+    <string name="max_members_limit">Максимум участников: %d</string>
+    <string name="selected_count">Выбрано: %d</string>
+    <string name="select_at_least_one">Необходимо выбрать хотя бы одного участника</string>
+    <string name="only_captain_can_register">Только капитан команды может регистрировать команду на мероприятие</string>
+    <string name="team_registration_success">Команда успешно зарегистрирована на мероприятие!</string>
+    <string name="create_team_dialog_title">Создание команды</string>
+    <string name="create_team_dialog_message">У вас нет команды для участия в этом мероприятии. Хотите создать команду?</string>
+    <string name="create_team_button">Создать</string>
+    <string name="cancel_button">Отмена</string>
+    <string name="confirm_button">Подтвердить</string>
+    <string name="register_button_text">Зарегистрироваться</string>
+    <string name="registered_button_text">Зарегистрированы</string>
+
     <!-- Navigation -->
     <string name="menu_events">Мероприятия</string>
     <string name="menu_profile">Профиль</string>
@@ -30,4 +45,8 @@
     <string name="error_register">Ошибка регистрации</string>
     <string name="error_load_events">Ошибка загрузки мероприятий</string>
     <string name="error_load_profile">Ошибка загрузки профиля</string>
+    <string name="error_check_team">Ошибка проверки команды</string>
+    <string name="error_team_registration">Ошибка регистрации команды на мероприятие</string>
+    <string name="error_load_event">Ошибка загрузки мероприятия</string>
+    <string name="need_login">Необходимо войти в систему</string>
 </resources>

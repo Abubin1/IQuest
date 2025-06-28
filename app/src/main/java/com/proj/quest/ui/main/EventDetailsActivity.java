@@ -2,8 +2,10 @@ package com.proj.quest.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,10 +21,14 @@ import com.proj.quest.models.TeamRegistrationRequest;
 import com.proj.quest.models.TeamRegistrationResponse;
 import com.proj.quest.Group.CreateGroupActivity;
 import com.proj.quest.utils.SharedPrefs;
+import com.proj.quest.ui.adapters.TeamMemberSelectionAdapter;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -96,7 +102,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     private void checkTeamAndRegister() {
         String token = sharedPrefs.getToken();
         if (token == null || token.isEmpty()) {
-            Toast.makeText(this, "Необходимо войти в систему", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.need_login), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -120,7 +126,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                         System.out.println("DEBUG: User is not captain - Captain: " + team.getCaptainId() + ", User: " + sharedPrefs.getUserId());
                         // Пользователь не капитан
                         Toast.makeText(EventDetailsActivity.this, 
-                            "Только капитан команды может регистрировать команду на мероприятие", 
+                            getString(R.string.only_captain_can_register), 
                             Toast.LENGTH_LONG).show();
                     }
                 } else if (response.code() == 404) {
@@ -130,7 +136,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                 } else {
                     System.out.println("DEBUG: Error checking team - " + response.code());
                     Toast.makeText(EventDetailsActivity.this, 
-                        "Ошибка проверки команды", Toast.LENGTH_SHORT).show();
+                        getString(R.string.error_check_team), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -141,28 +147,92 @@ public class EventDetailsActivity extends AppCompatActivity {
                 }
                 System.out.println("DEBUG: Network error checking team - " + t.getMessage());
                 Toast.makeText(EventDetailsActivity.this, 
-                    "Ошибка сети", Toast.LENGTH_SHORT).show();
+                    getString(R.string.error_network), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void showCreateTeamDialog() {
         new AlertDialog.Builder(this)
-            .setTitle("Создание команды")
-            .setMessage("У вас нет команды для участия в этом мероприятии. Хотите создать команду?")
-            .setPositiveButton("Создать", (dialog, which) -> {
+            .setTitle(getString(R.string.create_team_dialog_title))
+            .setMessage(getString(R.string.create_team_dialog_message))
+            .setPositiveButton(getString(R.string.create_team_button), (dialog, which) -> {
                 Intent intent = new Intent(this, CreateGroupActivity.class);
                 intent.putExtra("eventId", event.getId());
                 startActivity(intent);
             })
-            .setNegativeButton("Отмена", null)
+            .setNegativeButton(getString(R.string.cancel_button), null)
             .show();
     }
 
     private void showTeamMemberSelectionDialog(Team team) {
-        // Здесь должна быть логика выбора участников команды
-        // Пока просто регистрируем команду
-        registerTeamForEvent(team.getId());
+        // Создаем диалог для выбора участников
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_team_member_selection, null);
+        builder.setView(dialogView);
+
+        // Настраиваем элементы диалога
+        TextView tvMemberLimit = dialogView.findViewById(R.id.tvMemberLimit);
+        TextView tvSelectedCount = dialogView.findViewById(R.id.tvSelectedCount);
+        ListView listViewMembers = dialogView.findViewById(R.id.listViewMembers);
+        Button btnCancel = dialogView.findViewById(R.id.btnCancel);
+        Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
+
+        // Устанавливаем лимит участников
+        tvMemberLimit.setText(getString(R.string.max_members_limit, event.getMaxTeamMembers()));
+
+        // Создаем адаптер для списка участников
+        TeamMemberSelectionAdapter adapter = new TeamMemberSelectionAdapter(
+            this, 
+            team.getMembers(), 
+            event.getMaxTeamMembers(), 
+            sharedPrefs.getUserId()
+        );
+        
+        // Устанавливаем слушатель изменений выбора
+        adapter.setOnSelectionChangedListener(selectedCount -> {
+            updateSelectedCount(tvSelectedCount, selectedCount);
+        });
+        
+        listViewMembers.setAdapter(adapter);
+
+        // Обновляем счетчик выбранных участников
+        updateSelectedCount(tvSelectedCount, adapter.getSelectedCount());
+
+        // Создаем диалог
+        AlertDialog dialog = builder.create();
+
+        // Настраиваем кнопки
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        btnConfirm.setOnClickListener(v -> {
+            Set<Integer> selectedIds = adapter.getSelectedMemberIds();
+            if (selectedIds.size() < 1) {
+                Toast.makeText(this, getString(R.string.select_at_least_one), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            // Регистрируем команду с выбранными участниками
+            List<Integer> selectedList = new ArrayList<>(selectedIds);
+            registerTeamForEvent(team.getId(), selectedList);
+            dialog.dismiss();
+        });
+
+        dialog.show();
+    }
+
+    private void updateSelectedCount(TextView tvSelectedCount, TeamMemberSelectionAdapter adapter) {
+        updateSelectedCount(tvSelectedCount, adapter.getSelectedCount());
+    }
+
+    private void updateSelectedCount(TextView tvSelectedCount, int selectedCount) {
+        tvSelectedCount.setText(getString(R.string.selected_count, selectedCount));
+        
+        // Обновляем цвет в зависимости от лимита
+        if (selectedCount >= event.getMaxTeamMembers()) {
+            tvSelectedCount.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+        } else {
+            tvSelectedCount.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
+        }
     }
 
     private void showErrorDialog(String title, String message) {
@@ -174,9 +244,14 @@ public class EventDetailsActivity extends AppCompatActivity {
     }
 
     private void registerTeamForEvent(int teamId) {
+        // Старый метод для обратной совместимости
+        registerTeamForEvent(teamId, null);
+    }
+
+    private void registerTeamForEvent(int teamId, List<Integer> selectedMemberIds) {
         String token = sharedPrefs.getToken();
         if (token == null || token.isEmpty()) {
-            Toast.makeText(this, "Необходимо войти в систему", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.need_login), Toast.LENGTH_SHORT).show();
             return;
         }
         
@@ -184,8 +259,12 @@ public class EventDetailsActivity extends AppCompatActivity {
         TeamRegistrationRequest request = new TeamRegistrationRequest();
         request.setTeamId(teamId);
         request.setEventId(event.getId());
+        if (selectedMemberIds != null) {
+            request.setSelectedMemberIds(selectedMemberIds);
+        }
         
-        System.out.println("DEBUG: Registering team " + teamId + " for event " + event.getId());
+        System.out.println("DEBUG: Registering team " + teamId + " for event " + event.getId() + 
+                          " with " + (selectedMemberIds != null ? selectedMemberIds.size() : 0) + " members");
         
         apiService.registerTeamForEvent("Bearer " + token, request).enqueue(new Callback<TeamRegistrationResponse>() {
             @Override
@@ -197,9 +276,9 @@ public class EventDetailsActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     System.out.println("DEBUG: Team registration successful");
                     Toast.makeText(EventDetailsActivity.this, 
-                        "Команда успешно зарегистрирована на мероприятие!", Toast.LENGTH_LONG).show();
+                        getString(R.string.team_registration_success), Toast.LENGTH_LONG).show();
                     btnRegister.setEnabled(false);
-                    btnRegister.setText("Зарегистрированы");
+                    btnRegister.setText(getString(R.string.registered_button_text));
                 } else {
                     System.out.println("DEBUG: Team registration failed - " + response.code());
                     // Обрабатываем ошибку от сервера
@@ -213,13 +292,13 @@ public class EventDetailsActivity extends AppCompatActivity {
                                 String errorMessage = errorBody.substring(startIndex, endIndex);
                                 showErrorDialog("Ошибка регистрации", errorMessage);
                             } else {
-                                showErrorDialog("Ошибка", "Ошибка регистрации команды на мероприятие");
+                                showErrorDialog("Ошибка", getString(R.string.error_team_registration));
                             }
                         } else {
-                            showErrorDialog("Ошибка", "Ошибка регистрации команды на мероприятие");
+                            showErrorDialog("Ошибка", getString(R.string.error_team_registration));
                         }
                     } catch (Exception e) {
-                        showErrorDialog("Ошибка", "Ошибка регистрации команды на мероприятие");
+                        showErrorDialog("Ошибка", getString(R.string.error_team_registration));
                     }
                 }
             }
@@ -229,7 +308,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                     return; // Активность уничтожена
                 }
                 System.out.println("DEBUG: Network error during registration - " + t.getMessage());
-                showErrorDialog("Ошибка сети", "Не удалось зарегистрировать команду. Проверьте подключение к интернету.");
+                showErrorDialog(getString(R.string.error_network), "Не удалось зарегистрировать команду. Проверьте подключение к интернету.");
             }
         });
     }
