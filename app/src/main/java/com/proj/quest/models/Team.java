@@ -13,6 +13,7 @@ public class Team implements Serializable {
     private int captainId;
     @SerializedName("members")
     private List<User> members;
+    @SerializedName("eventId")
     private Integer eventId;
 
     public Team() {}

@@ -109,33 +109,25 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                             public void onResponse(retrofit2.Call<java.util.List<Event>> call, retrofit2.Response<java.util.List<Event>> response) {
                                 if (response.isSuccessful() && response.body() != null) {
                                     java.util.List<Event> events = response.body();
-                                    long now = System.currentTimeMillis();
-                                    Event nearest = null;
+                                    Event registeredEvent = null;
                                     for (Event event : events) {
                                         if (event.getId() == team.getEventId()) {
-                                            // Проверяем, что дата в будущем
-                                            try {
-                                                java.text.SimpleDateFormat parser = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
-                                                parser.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-                                                java.util.Date eventDate = parser.parse(event.getStartDate());
-                                                if (eventDate != null && eventDate.getTime() > now) {
-                                                    nearest = event;
-                                                    break;
-                                                }
-                                            } catch (Exception ignored) {}
+                                            registeredEvent = event;
+                                            break;
                                         }
                                     }
-                                    if (nearest != null) {
+                                    if (registeredEvent != null) {
                                         Intent intent = new Intent(MainActivity.this, RiddleActivity.class);
-                                        intent.putExtra("EVENT_ID", nearest.getId());
-                                        intent.putExtra("EVENT_TIME", nearest.getStartDate());
+                                        intent.putExtra("EVENT_ID", registeredEvent.getId());
+                                        String eventDateTime = registeredEvent.getStartDate() + "T" + registeredEvent.getStartTime() + ".000Z";
+                                        intent.putExtra("EVENT_TIME", eventDateTime);
                                         intent.putExtra("IS_REGISTERED", true);
-                                        if (nearest.getThemeUrl() != null) {
-                                            intent.putExtra("EVENT_THEME_URL", nearest.getThemeUrl());
+                                        if (registeredEvent.getThemeUrl() != null) {
+                                            intent.putExtra("EVENT_THEME_URL", registeredEvent.getThemeUrl());
                                         }
                                         startActivity(intent);
                                     } else {
-                                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "Нет ближайших мероприятий для вашей группы", Toast.LENGTH_SHORT).show());
+                                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "Мероприятие, на которое зарегистрирована группа, не найдено", Toast.LENGTH_SHORT).show());
                                     }
                                 } else {
                                     runOnUiThread(() -> Toast.makeText(MainActivity.this, "Ошибка загрузки мероприятий", Toast.LENGTH_SHORT).show());

@@ -1,6 +1,7 @@
 package com.proj.quest.Group;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,20 +44,16 @@ public class EventGroupAdapter extends BaseAdapter {
         Event event = events.get(i);
         TextView tvEventName = view.findViewById(R.id.tvEventName);
         TextView tvEventDate = view.findViewById(R.id.tvEventDate);
-        TextView tvEventTime = view.findViewById(R.id.tvEventTime);
         TextView tvEventLocation = view.findViewById(R.id.tvEventLocation);
         TextView tvEventStatus = view.findViewById(R.id.tvEventStatus);
-        TextView tvTeamCount = view.findViewById(R.id.tvTeamCount);
-        TextView tvOrganizer = view.findViewById(R.id.tvOrganizer);
         
         tvEventName.setText(event.getName());
         tvEventLocation.setText(event.getStartLocation() != null ? event.getStartLocation() : "Не указано");
-        tvEventTime.setText(event.getStartTime() != null ? event.getStartTime() : "Не указано");
         
-        // Форматируем дату
-        Date eventDate = parseStartDate(event.getStartDate());
+        // Форматируем дату и время
+        Date eventDate = parseStartDateTime(event.getStartDate(), event.getStartTime());
         if (eventDate != null) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
             tvEventDate.setText(dateFormat.format(eventDate));
         } else {
             tvEventDate.setText("Не указана");
@@ -64,8 +61,11 @@ public class EventGroupAdapter extends BaseAdapter {
         
         // Определяем статус мероприятия
         if (currentEventId != null && currentEventId.equals(event.getId())) {
-            tvEventStatus.setText("Текущее мероприятие");
-            tvEventStatus.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
+            tvEventStatus.setText("Ближайшее мероприятие");
+            tvEventStatus.setTextColor(context.getResources().getColor(android.R.color.holo_blue_dark));
+            // Выделяем фон и текст
+            view.setBackgroundColor(Color.parseColor("#E3F2FD"));
+            tvEventName.setTextColor(Color.parseColor("#1976D2"));
         } else {
             Date now = new Date();
             if (eventDate != null) {
@@ -86,22 +86,22 @@ public class EventGroupAdapter extends BaseAdapter {
                 tvEventStatus.setText("Дата не указана");
                 tvEventStatus.setTextColor(context.getResources().getColor(android.R.color.darker_gray));
             }
+            // Сброс выделения
+            view.setBackgroundColor(Color.WHITE);
+            tvEventName.setTextColor(Color.parseColor("#333333"));
         }
-        
-        tvTeamCount.setText(String.valueOf(event.getTeamCount()));
-        tvOrganizer.setText(event.getOrganizer() != null ? event.getOrganizer() : "-");
         
         return view;
     }
 
-    private Date parseStartDate(String dateString) {
-        if (dateString == null) return null;
+    private Date parseStartDateTime(String date, String time) {
+        if (date == null || time == null) return null;
+        String dateTime = date + "T" + time + ".000Z";
         SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        parser.setTimeZone(TimeZone.getTimeZone("UTC"));
+        parser.setTimeZone(TimeZone.getDefault());
         try {
-            return parser.parse(dateString);
+            return parser.parse(dateTime);
         } catch (ParseException e) {
-            e.printStackTrace();
             return null;
         }
     }

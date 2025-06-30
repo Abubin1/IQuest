@@ -172,77 +172,68 @@ public class EventsFragment extends Fragment {
     }
 
     private void filterAndDisplayEvents() {
-        List<Event> filteredEvents = new ArrayList<>();
-        Date now = new Date();
-
-        // Находим ближайшее мероприятие пользователя
-        Event nearestUserEvent = null;
         List<Event> futureEvents = new ArrayList<>();
-
+        List<Event> finishedEvents = new ArrayList<>();
+        Date now = new Date();
+        Event nearestUserEvent = null;
         for (Event event : allEvents) {
-            Date eventDate = parseStartDate(event.getStartDate());
+            Date eventDate = parseStartDateTime(event.getStartDate(), event.getStartTime());
             if (eventDate == null) continue;
-
-            // Проверяем, что мероприятие в будущем
+            boolean isRegistered = false;
+            for (Team team : userTeams) {
+                if (team.getEventId() != null && team.getEventId().intValue() == event.getId()) {
+                    isRegistered = true;
+                    break;
+                }
+            }
+            // Мероприятие завершено, если прошло более 3 часов с начала
+            if (now.getTime() > eventDate.getTime() + 3 * 60 * 60 * 1000) {
+                finishedEvents.add(event);
+                continue;
+            }
             if (eventDate.after(now)) {
                 futureEvents.add(event);
-
-                // Проверяем, записана ли команда пользователя на это мероприятие
-                boolean isRegistered = false;
-                for (Team team : userTeams) {
-                    if (team.getEventId() != null && team.getEventId().intValue() == event.getId()) {
-                        isRegistered = true;
-                        break;
-                    }
-                }
-
                 if (isRegistered) {
-                    // Если это ближайшее мероприятие пользователя
-                    Date nearestEventDate = (nearestUserEvent != null) ? parseStartDate(nearestUserEvent.getStartDate()) : null;
+                    Date nearestEventDate = (nearestUserEvent != null) ? parseStartDateTime(nearestUserEvent.getStartDate(), nearestUserEvent.getStartTime()) : null;
                     if (nearestEventDate == null || eventDate.before(nearestEventDate)) {
                         nearestUserEvent = event;
                     }
                 }
             }
         }
-
-        // Сортируем будущие мероприятия по дате
         Collections.sort(futureEvents, (e1, e2) -> {
-            Date d1 = parseStartDate(e1.getStartDate());
-            Date d2 = parseStartDate(e2.getStartDate());
+            Date d1 = parseStartDateTime(e1.getStartDate(), e1.getStartTime());
+            Date d2 = parseStartDateTime(e2.getStartDate(), e2.getStartTime());
             if (d1 == null && d2 == null) return 0;
             if (d1 == null) return 1;
             if (d2 == null) return -1;
             return d1.compareTo(d2);
         });
-
-        // Удаляем ближайшее мероприятие пользователя из общего списка, чтобы избежать дублирования
+        Collections.sort(finishedEvents, (e1, e2) -> {
+            Date d1 = parseStartDateTime(e1.getStartDate(), e1.getStartTime());
+            Date d2 = parseStartDateTime(e2.getStartDate(), e2.getStartTime());
+            if (d1 == null && d2 == null) return 0;
+            if (d1 == null) return 1;
+            if (d2 == null) return -1;
+            return d2.compareTo(d1); // завершённые — новые сверху
+        });
+        // Формируем список остальных мероприятий (без ближайшего)
+        List<Event> otherEvents = new ArrayList<>(futureEvents);
         if (nearestUserEvent != null) {
-            futureEvents.remove(nearestUserEvent);
+            otherEvents.remove(nearestUserEvent);
         }
-
-        // Добавляем ближайшее мероприятие пользователя в начало списка, если оно есть
-        if (nearestUserEvent != null) {
-            filteredEvents.add(nearestUserEvent);
-        }
-
-        // Добавляем остальные будущие мероприятия
-        filteredEvents.addAll(futureEvents);
-
-
-        adapter.setEvents(filteredEvents);
+        adapter.setEvents(futureEvents, nearestUserEvent, otherEvents, finishedEvents);
         adapter.setUserTeams(userTeams);
     }
 
-    private Date parseStartDate(String dateString) {
-        if (dateString == null) return null;
-        // Формат, который приходит от сервера: "2025-07-01T21:00:00.000Z"
+    private Date parseStartDateTime(String date, String time) {
+        if (date == null || time == null) return null;
+        String dateTime = date + "T" + time + ".000Z";
         SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        parser.setTimeZone(TimeZone.getTimeZone("UTC"));
+        parser.setTimeZone(TimeZone.getDefault());
         try {
-            return parser.parse(dateString);
+            return parser.parse(dateTime);
         } catch (ParseException e) {
-            // e.printStackTrace(); // Не спамим в лог, если дата просто некорректна
             return null;
         }
     }

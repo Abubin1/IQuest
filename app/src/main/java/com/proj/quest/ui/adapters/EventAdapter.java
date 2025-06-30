@@ -27,15 +27,46 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
-    private List<Event> events;
-    private Context context;
+public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private static final int VIEW_TYPE_SECTION_HEADER = 0;
+    private static final int VIEW_TYPE_EVENT_ITEM = 1;
+
+    public static class SectionedItem {
+        public int type; // 0 - header, 1 - event
+        public String headerText;
+        public Event event;
+        public SectionedItem(int type, String headerText, Event event) {
+            this.type = type;
+            this.headerText = headerText;
+            this.event = event;
+        }
+    }
+
+    private List<SectionedItem> items = new java.util.ArrayList<>();
     private List<Team> userTeams;
+    private Context context;
     private SharedPrefs sharedPrefs;
 
-    public void setEvents(List<Event> events) {
-        this.events = events;
+    public void setEvents(List<Event> allEvents, Event nearestUserEvent, List<Event> otherEvents, List<Event> finishedEvents) {
+        items.clear();
+        if (nearestUserEvent != null) {
+            items.add(new SectionedItem(VIEW_TYPE_SECTION_HEADER, "Ближайшее с группой", null));
+            items.add(new SectionedItem(VIEW_TYPE_EVENT_ITEM, null, nearestUserEvent));
+        }
+        if (!otherEvents.isEmpty()) {
+            items.add(new SectionedItem(VIEW_TYPE_SECTION_HEADER, "Остальные мероприятия", null));
+            for (Event e : otherEvents) {
+                items.add(new SectionedItem(VIEW_TYPE_EVENT_ITEM, null, e));
+            }
+        }
+        if (!finishedEvents.isEmpty()) {
+            items.add(new SectionedItem(VIEW_TYPE_SECTION_HEADER, "Завершенные мероприятия", null));
+            for (Event e : finishedEvents) {
+                items.add(new SectionedItem(VIEW_TYPE_EVENT_ITEM, null, e));
+            }
+        }
         notifyDataSetChanged();
     }
 
@@ -44,66 +75,61 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         notifyDataSetChanged();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return items.get(position).type;
+    }
+
     @NonNull
     @Override
-    public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
         sharedPrefs = new SharedPrefs(context);
-        View view = LayoutInflater.from(context)
-                .inflate(R.layout.item_event, parent, false);
-        return new EventViewHolder(view);
+        if (viewType == VIEW_TYPE_SECTION_HEADER) {
+            View view = LayoutInflater.from(context).inflate(R.layout.item_section_header, parent, false);
+            return new SectionHeaderViewHolder(view);
+        } else {
+            View view = LayoutInflater.from(context).inflate(R.layout.item_event, parent, false);
+            return new EventViewHolder(view);
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
-        Event event = events.get(position);
-        
-        // Проверяем, является ли это ближайшим мероприятием пользователя
-        boolean isNearestUserEvent = isNearestUserEvent(event);
-        
-        // Название мероприятия
-        holder.tvEventName.setText(event.getName() != null ? event.getName() : "Без названия");
-        
-        // Организатор
-        holder.tvOrganizer.setText("Организатор: " + (event.getOrganizer() != null ? event.getOrganizer() : "Не указан"));
-        
-        // Дата проведения
-        if (event.getStartDate() != null && !event.getStartDate().isEmpty()) {
-            Date eventDate = parseStartDate(event.getStartDate());
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        SectionedItem item = items.get(position);
+        if (item.type == VIEW_TYPE_SECTION_HEADER) {
+            ((SectionHeaderViewHolder) holder).tvSectionHeader.setText(item.headerText);
+        } else if (item.type == VIEW_TYPE_EVENT_ITEM) {
+            Event event = item.event;
+            EventViewHolder eventHolder = (EventViewHolder) holder;
+            boolean isNearestUserEvent = isNearestUserEvent(event);
+            eventHolder.tvEventName.setText(event.getName() != null ? event.getName() : "Без названия");
+            eventHolder.tvOrganizer.setText("Организатор: " + (event.getOrganizer() != null ? event.getOrganizer() : "Не указан"));
+            Date eventDate = parseStartDateTime(event.getStartDate(), event.getStartTime());
             if (eventDate != null) {
                 SimpleDateFormat displayFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
-                holder.tvEventDate.setText("Дата: " + displayFormat.format(eventDate));
+                eventHolder.tvEventDate.setText("Дата: " + displayFormat.format(eventDate));
             } else {
-                holder.tvEventDate.setText("Дата: неверный формат");
+                eventHolder.tvEventDate.setText("Дата: неверный формат");
             }
-        } else {
-            holder.tvEventDate.setText("Дата: Не указана");
+            eventHolder.tvTeamCount.setText("Зарегистрированные команды: " + event.getTeamCount());
+            eventHolder.tvMaxMembers.setText("Макс. участников: " + event.getMaxTeamMembers());
+            if (isNearestUserEvent) {
+                eventHolder.cardView.setCardBackgroundColor(Color.parseColor("#E3F2FD"));
+                eventHolder.tvEventName.setTextColor(Color.parseColor("#1976D2"));
+                eventHolder.tvNearestEvent.setVisibility(View.VISIBLE);
+                eventHolder.tvNearestEvent.setText("⭐ Ваше ближайшее мероприятие");
+            } else {
+                eventHolder.cardView.setCardBackgroundColor(Color.WHITE);
+                eventHolder.tvEventName.setTextColor(Color.BLACK);
+                eventHolder.tvNearestEvent.setVisibility(View.GONE);
+            }
+            eventHolder.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(context, EventDetailsActivity.class);
+                intent.putExtra("event", event);
+                context.startActivity(intent);
+            });
         }
-        
-        // Количество команд
-        holder.tvTeamCount.setText("Зарегистрированные команды: " + event.getTeamCount());
-        
-        // Максимальное количество участников
-        holder.tvMaxMembers.setText("Макс. участников: " + event.getMaxTeamMembers());
-
-        // Применяем специальное оформление для ближайшего мероприятия
-        if (isNearestUserEvent) {
-            holder.cardView.setCardBackgroundColor(Color.parseColor("#E3F2FD")); // Светло-голубой фон
-            holder.tvEventName.setTextColor(Color.parseColor("#1976D2")); // Синий текст
-            holder.tvNearestEvent.setVisibility(View.VISIBLE);
-            holder.tvNearestEvent.setText("⭐ Ваше ближайшее мероприятие");
-        } else {
-            holder.cardView.setCardBackgroundColor(Color.WHITE);
-            holder.tvEventName.setTextColor(Color.BLACK);
-            holder.tvNearestEvent.setVisibility(View.GONE);
-        }
-
-        // Обработка клика
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, EventDetailsActivity.class);
-            intent.putExtra("event", event);
-            context.startActivity(intent);
-        });
     }
 
     private boolean isUserParticipant(Event event) {
@@ -118,15 +144,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         return false;
     }
 
-    private Date parseStartDate(String dateString) {
-        if (dateString == null) return null;
-        // Формат, который приходит от сервера: "2025-07-01T21:00:00.000Z"
+    private Date parseStartDateTime(String date, String time) {
+        if (date == null || time == null) return null;
+        String dateTime = date + "T" + time + ".000Z";
         SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        parser.setTimeZone(TimeZone.getTimeZone("UTC"));
+        parser.setTimeZone(TimeZone.getDefault());
         try {
-            return parser.parse(dateString);
+            return parser.parse(dateTime);
         } catch (ParseException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -134,15 +159,18 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     private boolean isNearestUserEvent(Event event) {
         if (!isUserParticipant(event)) return false;
         
-        Date eventDate = parseStartDate(event.getStartDate());
+        Date eventDate = parseStartDateTime(event.getStartDate(), event.getStartTime());
         if (eventDate == null) return false;
         
         Date now = new Date();
         if (eventDate.after(now)) {
             // Проверяем, нет ли более близких мероприятий
             boolean isNearest = true;
-            for (Event otherEvent : events) {
-                Date otherEventDate = parseStartDate(otherEvent.getStartDate());
+            for (Event otherEvent : items.stream()
+                    .filter(item -> item.type == VIEW_TYPE_EVENT_ITEM)
+                    .map(item -> item.event)
+                    .collect(Collectors.toList())) {
+                Date otherEventDate = parseStartDateTime(otherEvent.getStartDate(), otherEvent.getStartTime());
                 if (otherEvent.getId() != event.getId() &&
                     isUserParticipant(otherEvent) &&
                     otherEventDate != null &&
@@ -160,7 +188,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     @Override
     public int getItemCount() {
-        return events != null ? events.size() : 0;
+        return items.size();
+    }
+
+    static class SectionHeaderViewHolder extends RecyclerView.ViewHolder {
+        TextView tvSectionHeader;
+        public SectionHeaderViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvSectionHeader = itemView.findViewById(R.id.tvSectionHeader);
+        }
     }
 
     static class EventViewHolder extends RecyclerView.ViewHolder {
@@ -171,7 +207,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         TextView tvTeamCount;
         TextView tvMaxMembers;
         TextView tvNearestEvent;
-
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
             cardView = itemView.findViewById(R.id.cardView);

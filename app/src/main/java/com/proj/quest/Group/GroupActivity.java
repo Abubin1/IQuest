@@ -172,34 +172,27 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     private void showTeamEvents() {
-        // Фильтруем ближайшее будущее мероприятие, если нет — последнее прошедшее
+        // Показываем только ближайшее мероприятие, на которое записана команда
         Event nearestFutureEvent = null;
-        Event lastPastEvent = null;
         long now = System.currentTimeMillis();
         for (Event event : teamEvents) {
-            if (event.getStartDate() != null) {
+            if (event.getStartDate() != null && event.getId() == (currentTeam != null && currentTeam.getEventId() != null ? currentTeam.getEventId() : -1)) {
                 try {
+                    String dateTime = event.getStartDate() + "T" + event.getStartTime() + ".000Z";
                     java.text.SimpleDateFormat parser = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
                     parser.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-                    java.util.Date eventDate = parser.parse(event.getStartDate());
-                    if (eventDate != null) {
-                        if (eventDate.getTime() > now) {
-                            if (nearestFutureEvent == null || eventDate.getTime() < parser.parse(nearestFutureEvent.getStartDate()).getTime()) {
-                                nearestFutureEvent = event;
-                            }
-                        } else {
-                            if (lastPastEvent == null || eventDate.getTime() > parser.parse(lastPastEvent.getStartDate()).getTime()) {
-                                lastPastEvent = event;
-                            }
+                    java.util.Date eventDate = parser.parse(dateTime);
+                    if (eventDate != null && eventDate.getTime() > now) {
+                        if (nearestFutureEvent == null || eventDate.getTime() < parser.parse(nearestFutureEvent.getStartDate() + "T" + nearestFutureEvent.getStartTime() + ".000Z").getTime()) {
+                            nearestFutureEvent = event;
                         }
                     }
                 } catch (Exception ignored) {}
             }
         }
-        java.util.List<Event> filtered = new java.util.ArrayList<>();
+        List<Event> filtered = new ArrayList<>();
         if (nearestFutureEvent != null) filtered.add(nearestFutureEvent);
-        else if (lastPastEvent != null) filtered.add(lastPastEvent);
-        EventGroupAdapter adapter = new EventGroupAdapter(this, filtered, currentTeam.getEventId());
+        EventGroupAdapter adapter = new EventGroupAdapter(this, filtered, nearestFutureEvent != null ? nearestFutureEvent.getId() : null);
         eventsListView.setAdapter(adapter);
     }
 

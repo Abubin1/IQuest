@@ -80,7 +80,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         tvOrganizer.setText(event.getOrganizer() != null ? event.getOrganizer() : "Не указан");
         
         // Форматируем дату
-        Date eventDate = parseStartDate(event.getStartDate());
+        Date eventDate = parseStartDateTime(event.getStartDate(), event.getStartTime());
         if (eventDate != null) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
             tvEventDate.setText(dateFormat.format(eventDate));
@@ -98,14 +98,14 @@ public class EventDetailsActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(v -> checkTeamAndRegister());
     }
 
-    private Date parseStartDate(String dateString) {
-        if (dateString == null) return null;
+    private Date parseStartDateTime(String date, String time) {
+        if (date == null || time == null) return null;
+        String dateTime = date + "T" + time + ".000Z";
         SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        parser.setTimeZone(TimeZone.getTimeZone("UTC"));
+        parser.setTimeZone(TimeZone.getDefault());
         try {
-            return parser.parse(dateString);
+            return parser.parse(dateTime);
         } catch (ParseException e) {
-            e.printStackTrace();
             return null;
         }
     }
