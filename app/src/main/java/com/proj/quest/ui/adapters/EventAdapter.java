@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -16,13 +17,16 @@ import com.proj.quest.R;
 import com.proj.quest.models.Event;
 import com.proj.quest.models.Team;
 import com.proj.quest.ui.main.EventDetailsActivity;
+import com.proj.quest.Riddle.RiddleActivity;
 import com.proj.quest.utils.SharedPrefs;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
     private List<Event> events;
@@ -64,15 +68,20 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.tvOrganizer.setText("Организатор: " + (event.getOrganizer() != null ? event.getOrganizer() : "Не указан"));
         
         // Дата проведения
-        if (event.getEventDate() != null) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-            holder.tvEventDate.setText("Дата: " + dateFormat.format(event.getEventDate()));
+        if (event.getStartDate() != null && !event.getStartDate().isEmpty()) {
+            Date eventDate = parseStartDate(event.getStartDate());
+            if (eventDate != null) {
+                SimpleDateFormat displayFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
+                holder.tvEventDate.setText("Дата: " + displayFormat.format(eventDate));
+            } else {
+                holder.tvEventDate.setText("Дата: неверный формат");
+            }
         } else {
             holder.tvEventDate.setText("Дата: Не указана");
         }
         
         // Количество команд
-        holder.tvTeamCount.setText("Команды: " + event.getTeamCount());
+        holder.tvTeamCount.setText("Зарегистрированные команды: " + event.getTeamCount());
         
         // Максимальное количество участников
         holder.tvMaxMembers.setText("Макс. участников: " + event.getMaxTeamMembers());
@@ -97,39 +106,54 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         });
     }
 
-    private boolean isNearestUserEvent(Event event) {
-        if (userTeams == null || userTeams.isEmpty()) return false;
-        
-        // Проверяем, записана ли команда пользователя на это мероприятие
+    private boolean isUserParticipant(Event event) {
+        if (userTeams == null || userTeams.isEmpty()) {
+            return false;
+        }
         for (Team team : userTeams) {
-            if (team.getEventId() != null && team.getEventId().intValue() == event.getId()) {
-                // Проверяем, является ли это ближайшим мероприятием
-                Date eventDate = event.getEventDate();
-                if (eventDate == null) continue;
-                
-                Date now = new Date();
-                if (eventDate.after(now)) {
-                    // Проверяем, нет ли более близких мероприятий
-                    boolean isNearest = true;
-                    for (Event otherEvent : events) {
-                        if (otherEvent.getId() != event.getId() && 
-                            otherEvent.getEventDate() != null && 
-                            otherEvent.getEventDate().after(now) &&
-                            otherEvent.getEventDate().before(eventDate)) {
-                            
-                            // Проверяем, записана ли команда на это более близкое мероприятие
-                            for (Team otherTeam : userTeams) {
-                                if (otherTeam.getEventId() != null && 
-                                    otherTeam.getEventId().intValue() == otherEvent.getId()) {
-                                    isNearest = false;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    return isNearest;
+            if (team.getEventId() != null && team.getEventId() == event.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Date parseStartDate(String dateString) {
+        if (dateString == null) return null;
+        // Формат, который приходит от сервера: "2025-07-01T21:00:00.000Z"
+        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        parser.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            return parser.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private boolean isNearestUserEvent(Event event) {
+        if (!isUserParticipant(event)) return false;
+        
+        Date eventDate = parseStartDate(event.getStartDate());
+        if (eventDate == null) return false;
+        
+        Date now = new Date();
+        if (eventDate.after(now)) {
+            // Проверяем, нет ли более близких мероприятий
+            boolean isNearest = true;
+            for (Event otherEvent : events) {
+                Date otherEventDate = parseStartDate(otherEvent.getStartDate());
+                if (otherEvent.getId() != event.getId() &&
+                    isUserParticipant(otherEvent) &&
+                    otherEventDate != null &&
+                    otherEventDate.after(now) &&
+                    otherEventDate.before(eventDate)) {
+                    
+                    isNearest = false;
+                    break;
                 }
             }
+            return isNearest;
         }
         return false;
     }

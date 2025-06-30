@@ -13,8 +13,11 @@ import com.proj.quest.models.AvatarResponse;
 import com.proj.quest.models.InviteRequest;
 import com.proj.quest.models.InviteResponse;
 import com.proj.quest.models.KickRequest;
+import com.proj.quest.models.CreateEventRequest;
+import com.proj.quest.models.RiddleRequest;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 
 import java.util.List;
 
@@ -28,6 +31,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Query;
 import retrofit2.http.Part;
 import retrofit2.http.DELETE;
+import retrofit2.http.Path;
 
 public interface ApiService {
     @POST("api/register")
@@ -133,4 +137,19 @@ public interface ApiService {
         @Header("Authorization") String token,
         @retrofit2.http.Path("teamId") int teamId
     );
+
+    @POST("api/events")
+    Call<Event> createEvent(
+            @Header("Authorization") String token,
+            @Body CreateEventRequest request
+    );
+
+    @GET("api/events/{id}/riddles")
+    Call<List<RiddleRequest>> getEventRiddles(@Header("Authorization") String token, @Path("id") int eventId);
+
+    @PUT("api/events/{id}/theme")
+    Call<Event> updateEventTheme(@Header("Authorization") String token, @Path("id") int eventId, @Body RequestBody themeUrl);
+
+    @GET("api/teams")
+    Call<List<Team>> getTeams(@Header("Authorization") String token);
 }

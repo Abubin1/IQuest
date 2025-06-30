@@ -23,12 +23,14 @@ import com.proj.quest.Group.CreateGroupActivity;
 import com.proj.quest.utils.SharedPrefs;
 import com.proj.quest.ui.adapters.TeamMemberSelectionAdapter;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -58,6 +60,7 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         setupViews();
         loadEventDetails();
+        loadRegisteredTeams();
     }
 
     private void setupViews() {
@@ -77,16 +80,17 @@ public class EventDetailsActivity extends AppCompatActivity {
         tvOrganizer.setText(event.getOrganizer() != null ? event.getOrganizer() : "Не указан");
         
         // Форматируем дату
-        if (event.getEventDate() != null) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-            tvEventDate.setText(dateFormat.format(event.getEventDate()));
+        Date eventDate = parseStartDate(event.getStartDate());
+        if (eventDate != null) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
+            tvEventDate.setText(dateFormat.format(eventDate));
         } else {
             tvEventDate.setText("Не указана");
         }
 
         tvStartTime.setText(event.getStartTime() != null ? event.getStartTime() : "Не указано");
         tvStartLocation.setText(event.getStartLocation() != null ? event.getStartLocation() : "Не указано");
-        tvTeamCount.setText(String.valueOf(event.getTeamCount()));
+        tvTeamCount.setText("Максимальное количество команд: " + event.getTeamCount());
         tvMaxMembers.setText(String.valueOf(event.getMaxTeamMembers()));
         tvRiddleCount.setText(String.valueOf(event.getRiddleCount()));
         tvDescription.setText(event.getDescription() != null ? event.getDescription() : "Описание отсутствует");
@@ -94,9 +98,57 @@ public class EventDetailsActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(v -> checkTeamAndRegister());
     }
 
+    private Date parseStartDate(String dateString) {
+        if (dateString == null) return null;
+        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        parser.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            return parser.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private void loadEventDetails() {
         // Здесь можно загрузить дополнительные детали мероприятия, если нужно
         // Пока используем данные, переданные из Intent
+    }
+
+    private void loadRegisteredTeams() {
+        String token = sharedPrefs.getToken();
+        if (token == null || token.isEmpty()) {
+            return;
+        }
+
+        apiService.getTeams("Bearer " + token).enqueue(new Callback<List<Team>>() {
+            @Override
+            public void onResponse(Call<List<Team>> call, Response<List<Team>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Team> allTeams = response.body();
+                    long registeredCount = 0;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        registeredCount = allTeams.stream()
+                                .filter(team -> team.getEventId() != null && team.getEventId() == event.getId())
+                                .count();
+                    } else {
+                        for (Team team : allTeams) {
+                            if (team.getEventId() != null && team.getEventId() == event.getId()) {
+                                registeredCount++;
+                            }
+                        }
+                    }
+
+                    TextView tvTeamCount = findViewById(R.id.tvTeamCount);
+                    tvTeamCount.setText("Количество команд: " + registeredCount + " / " + event.getTeamCount());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Team>> call, Throwable t) {
+                // Handle failure
+            }
+        });
     }
 
     private void checkTeamAndRegister() {
@@ -281,25 +333,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                     btnRegister.setText(getString(R.string.registered_button_text));
                 } else {
                     System.out.println("DEBUG: Team registration failed - " + response.code());
-                    // Обрабатываем ошибку от сервера
-                    try {
-                        String errorBody = response.errorBody().string();
-                        if (errorBody.contains("error")) {
-                            // Простое извлечение сообщения об ошибке
-                            int startIndex = errorBody.indexOf("\"error\":\"") + 9;
-                            int endIndex = errorBody.lastIndexOf("\"");
-                            if (startIndex > 8 && endIndex > startIndex) {
-                                String errorMessage = errorBody.substring(startIndex, endIndex);
-                                showErrorDialog("Ошибка регистрации", errorMessage);
-                            } else {
-                                showErrorDialog("Ошибка", getString(R.string.error_team_registration));
-                            }
-                        } else {
-                            showErrorDialog("Ошибка", getString(R.string.error_team_registration));
-                        }
-                    } catch (Exception e) {
-                        showErrorDialog("Ошибка", getString(R.string.error_team_registration));
-                    }
+                    showErrorDialog("Ошибка", getString(R.string.error_team_registration));
                 }
             }
             @Override

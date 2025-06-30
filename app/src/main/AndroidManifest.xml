@@ -2,10 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
+        android:name=".MainApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -17,29 +19,49 @@
         android:usesCleartextTraffic="true"
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.yandex.API_KEY"
+            android:value="YOUR_API_KEY" />
+
         <activity
             android:name=".ui.auth.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".ui.auth.RegisterActivity" />
-        <activity
-            android:name=".ui.main.MainActivity"
-            android:exported="false">
-        </activity>
-
+        <activity android:name=".ui.main.MainActivity" />
         <activity android:name=".ui.main.ProfileActivity" />
-        <activity android:name=".ui.settings.ProfileSettingsActivity" />
-        <activity android:name=".leaderboard.LeaderboardActivity" />
-        <activity android:name=".Group.CreateGroupActivity"/>
-        <activity android:name=".Group.GroupActivity"/>
-        <activity android:name=".Riddle.RiddleActivity"/>
+        <activity
+            android:name=".ui.settings.ProfileSettingsActivity"
+            android:label="@string/title_activity_profile_settings"
+            android:theme="@style/Theme.IQuest.NoActionBar" />
+        <activity
+            android:name=".leaderboard.LeaderboardActivity"
+            android:label="@string/title_activity_leaderboard"
+            android:theme="@style/Theme.IQuest.NoActionBar" />
+        <activity
+            android:name=".Group.CreateGroupActivity"
+            android:label="@string/title_activity_create_group"
+            android:theme="@style/Theme.IQuest.NoActionBar" />
+        <activity
+            android:name=".Group.GroupActivity"
+            android:label="@string/title_activity_group"
+            android:theme="@style/Theme.IQuest.NoActionBar" />
+        <activity
+            android:name=".Riddle.RiddleActivity"
+            android:label="@string/title_activity_riddle"
+            android:theme="@style/Theme.IQuest.NoActionBar" />
         <activity android:name=".ui.main.EventDetailsActivity" />
-
+        <activity android:name=".ui.main.TeamsActivity" />
+        <activity android:name=".ui.main.SelectTeamActivity" />
+        <activity android:name=".ui.main.CreateEventActivity" />
+        <activity android:name=".ui.main.CreateRiddlesActivity" />
+        <activity android:name=".ui.main.MapPickerActivity" />
+        <activity android:name=".ui.main.EventPreviewActivity" />
 
     </application>
 

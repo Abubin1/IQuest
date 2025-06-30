@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -15,6 +17,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(localPropertiesFile.inputStream())
+        }
+        
+        manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("MAPS_API_KEY", "DEFAULT_KEY")
     }
 
     buildTypes {
@@ -32,6 +42,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
+    }
+    buildFeatures {
+        viewBinding = true
     }
 }
 
@@ -60,4 +73,17 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
+    // OpenStreetMap
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
+
+    // AndroidX Preference for osmdroid configuration
+    implementation("androidx.preference:preference-ktx:1.2.1")
+
+    // Additional dependencies
+    implementation("com.google.android.material:material:1.10.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 }

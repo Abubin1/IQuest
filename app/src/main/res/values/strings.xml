@@ -49,4 +49,11 @@
     <string name="error_team_registration">Ошибка регистрации команды на мероприятие</string>
     <string name="error_load_event">Ошибка загрузки мероприятия</string>
     <string name="need_login">Необходимо войти в систему</string>
+
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_profile_settings">Настройки профиля</string>
+    <string name="title_activity_leaderboard">Таблица лидеров</string>
+    <string name="title_activity_group">Группа</string>
+    <string name="title_activity_create_group">Создание группы</string>
+    <string name="title_activity_riddle">Загадки</string>
 </resources>

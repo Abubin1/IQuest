@@ -11,20 +11,26 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.proj.quest.R;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
 import com.proj.quest.models.Event;
 import com.proj.quest.models.Team;
+import com.proj.quest.models.User;
 import com.proj.quest.ui.adapters.EventAdapter;
 import com.proj.quest.utils.SharedPrefs;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,6 +43,7 @@ public class EventsFragment extends Fragment {
     private SharedPrefs sharedPrefs;
     private List<Event> allEvents = new ArrayList<>();
     private List<Team> userTeams = new ArrayList<>();
+    private MaterialButton createEventButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,6 +51,7 @@ public class EventsFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        createEventButton = view.findViewById(R.id.createEvent);
 
         adapter = new EventAdapter();
         recyclerView.setAdapter(adapter);
@@ -51,9 +59,48 @@ public class EventsFragment extends Fragment {
         sharedPrefs = new SharedPrefs(requireContext());
         apiService = ApiClient.getApiService();
 
-        loadEvents();
+        createEventButton.setVisibility(View.GONE); // Скрыть по умолчанию
+        createEventButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), CreateEventActivity.class);
+            startActivity(intent);
+        });
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadUserProfile(); // Загружаем данные каждый раз, когда фрагмент становится видимым
+    }
+
+    private void loadUserProfile() {
+        String token = sharedPrefs.getToken();
+        if (token == null || token.isEmpty()) {
+            loadEvents(); // Продолжаем загрузку событий даже без токена
+            return;
+        }
+
+        apiService.getProfile("Bearer " + token).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (isAdded() && getContext() != null && response.isSuccessful() && response.body() != null) {
+                    User user = response.body();
+                    if (user.isOrganizer()) {
+                        createEventButton.setVisibility(View.VISIBLE);
+                    }
+                }
+                loadEvents(); // Загружаем события после проверки профиля
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                if (isAdded() && getContext() != null) {
+                    Toast.makeText(getContext(), "Ошибка загрузки профиля", Toast.LENGTH_SHORT).show();
+                }
+                loadEvents(); // Все равно загружаем события
+            }
+        });
     }
 
     private void loadEvents() {
@@ -126,22 +173,20 @@ public class EventsFragment extends Fragment {
 
     private void filterAndDisplayEvents() {
         List<Event> filteredEvents = new ArrayList<>();
-        Calendar calendar = Calendar.getInstance();
-        Date now = calendar.getTime();
-        
-        // Добавляем неделю к текущей дате
-        calendar.add(Calendar.WEEK_OF_YEAR, 1);
-        Date weekFromNow = calendar.getTime();
+        Date now = new Date();
 
         // Находим ближайшее мероприятие пользователя
         Event nearestUserEvent = null;
-        List<Event> weekEvents = new ArrayList<>();
+        List<Event> futureEvents = new ArrayList<>();
 
         for (Event event : allEvents) {
-            if (event.getEventDate() == null) continue;
+            Date eventDate = parseStartDate(event.getStartDate());
+            if (eventDate == null) continue;
 
             // Проверяем, что мероприятие в будущем
-            if (event.getEventDate().after(now)) {
+            if (eventDate.after(now)) {
+                futureEvents.add(event);
+
                 // Проверяем, записана ли команда пользователя на это мероприятие
                 boolean isRegistered = false;
                 for (Team team : userTeams) {
@@ -150,40 +195,55 @@ public class EventsFragment extends Fragment {
                         break;
                     }
                 }
-                
+
                 if (isRegistered) {
                     // Если это ближайшее мероприятие пользователя
-                    if (nearestUserEvent == null || event.getEventDate().before(nearestUserEvent.getEventDate())) {
+                    Date nearestEventDate = (nearestUserEvent != null) ? parseStartDate(nearestUserEvent.getStartDate()) : null;
+                    if (nearestEventDate == null || eventDate.before(nearestEventDate)) {
                         nearestUserEvent = event;
                     }
                 }
-                
-                // Добавляем мероприятия в течение недели
-                if (event.getEventDate().before(weekFromNow)) {
-                    weekEvents.add(event);
-                }
             }
         }
 
-        // Сортируем мероприятия по дате
-        Collections.sort(weekEvents, new Comparator<Event>() {
-            @Override
-            public int compare(Event e1, Event e2) {
-                return e1.getEventDate().compareTo(e2.getEventDate());
-            }
+        // Сортируем будущие мероприятия по дате
+        Collections.sort(futureEvents, (e1, e2) -> {
+            Date d1 = parseStartDate(e1.getStartDate());
+            Date d2 = parseStartDate(e2.getStartDate());
+            if (d1 == null && d2 == null) return 0;
+            if (d1 == null) return 1;
+            if (d2 == null) return -1;
+            return d1.compareTo(d2);
         });
 
-        // Добавляем ближайшее мероприятие пользователя в начало списка
+        // Удаляем ближайшее мероприятие пользователя из общего списка, чтобы избежать дублирования
         if (nearestUserEvent != null) {
-            filteredEvents.add(nearestUserEvent);
-            // Удаляем его из списка недельных мероприятий, чтобы избежать дублирования
-            weekEvents.remove(nearestUserEvent);
+            futureEvents.remove(nearestUserEvent);
         }
 
-        // Добавляем остальные мероприятия в течение недели
-        filteredEvents.addAll(weekEvents);
+        // Добавляем ближайшее мероприятие пользователя в начало списка, если оно есть
+        if (nearestUserEvent != null) {
+            filteredEvents.add(nearestUserEvent);
+        }
+
+        // Добавляем остальные будущие мероприятия
+        filteredEvents.addAll(futureEvents);
+
 
         adapter.setEvents(filteredEvents);
         adapter.setUserTeams(userTeams);
+    }
+
+    private Date parseStartDate(String dateString) {
+        if (dateString == null) return null;
+        // Формат, который приходит от сервера: "2025-07-01T21:00:00.000Z"
+        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        parser.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            return parser.parse(dateString);
+        } catch (ParseException e) {
+            // e.printStackTrace(); // Не спамим в лог, если дата просто некорректна
+            return null;
+        }
     }
 }

@@ -15,6 +15,13 @@
         android:layout_marginBottom="24dp"
         android:textColor="@android:color/black" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
     <!-- Список приглашений -->
     <ListView
         android:id="@+id/invites_list"

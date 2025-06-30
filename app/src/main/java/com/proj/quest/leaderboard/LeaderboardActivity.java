@@ -91,13 +91,9 @@ public class LeaderboardActivity extends AppCompatActivity {
             int itemId = item.getItemId();
 
             if (itemId == R.id.nav_leaders) {
-                // Уже на экране лидеров
                 return true;
             } else if (itemId == R.id.nav_riddles) {
-                startActivity(new Intent(this, MainActivity.class)
-                        .putExtra("fragment", "riddles"));
-                overridePendingTransition(0, 0);
-                finish();
+                Toast.makeText(this, "Перейдите на страницу мероприятия, чтобы открыть загадки", Toast.LENGTH_SHORT).show();
                 return true;
             } else if (itemId == R.id.nav_events) {
                 startActivity(new Intent(this, MainActivity.class)

@@ -10,6 +10,8 @@ public class User {
     private String login;
     @SerializedName("Почта")
     private String email;
+    @SerializedName("Пароль")
+    private String password;
     @SerializedName("КоличествоБаллов")
     private int score;
     @SerializedName("ДатаРегистрации")
@@ -18,6 +20,8 @@ public class User {
     private String avatarUrl;
     @SerializedName("teamId")
     private Integer teamId;
+    @SerializedName("is_organizer")
+    private boolean isOrganizer;
 
     public User() {}
 
@@ -29,6 +33,7 @@ public class User {
     public String getRegistrationDate() { return registrationDate; }
     public String getAvatarUrl() { return avatarUrl; }
     public Integer getTeamId() { return teamId; }
+    public boolean isOrganizer() { return isOrganizer; }
 
     // Сеттеры
     public void setId(int id) { this.id = id; }
@@ -38,4 +43,5 @@ public class User {
     public void setRegistrationDate(String registrationDate) { this.registrationDate = registrationDate; }
     public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
     public void setTeamId(Integer teamId) { this.teamId = teamId; }
+    public void setOrganizer(boolean organizer) { isOrganizer = organizer; }
 }

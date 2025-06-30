@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,7 @@ public class GroupsFragment extends Fragment {
     private ApiService apiService;
     private SharedPrefs sharedPrefs;
     private List<InviteResponse> invites = new ArrayList<>();
+    private ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,6 +48,7 @@ public class GroupsFragment extends Fragment {
         tvNoInvites = view.findViewById(R.id.tv_no_invites);
         btnCreateGroup = view.findViewById(R.id.btn_create_group);
         noInvitesContainer = view.findViewById(R.id.no_invites_container);
+        progressBar = view.findViewById(R.id.progressBar);
 
         apiService = ApiClient.getApiService();
         sharedPrefs = new SharedPrefs(requireContext());
@@ -61,6 +64,7 @@ public class GroupsFragment extends Fragment {
     }
 
     public void loadData() {
+        progressBar.setVisibility(View.VISIBLE);
         checkTeamAndLoadInvites();
     }
 
@@ -75,6 +79,7 @@ public class GroupsFragment extends Fragment {
         apiService.getMyTeam("Bearer " + token).enqueue(new Callback<Team>() {
             @Override
             public void onResponse(Call<Team> call, Response<Team> response) {
+                progressBar.setVisibility(View.GONE);
                 if (!isAdded() || getContext() == null) {
                     return; // Фрагмент отключен от активности
                 }
@@ -94,6 +99,7 @@ public class GroupsFragment extends Fragment {
 
             @Override
             public void onFailure(Call<Team> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
                 if (!isAdded() || getContext() == null) {
                     return; // Фрагмент отключен от активности
                 }
@@ -109,9 +115,11 @@ public class GroupsFragment extends Fragment {
             return;
         }
 
+        progressBar.setVisibility(View.VISIBLE);
         apiService.getInvites("Bearer " + token).enqueue(new Callback<List<InviteResponse>>() {
             @Override
             public void onResponse(Call<List<InviteResponse>> call, Response<List<InviteResponse>> response) {
+                progressBar.setVisibility(View.GONE);
                 if (!isAdded() || getContext() == null) {
                     return; // Фрагмент отключен от активности
                 }
@@ -138,6 +146,7 @@ public class GroupsFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<InviteResponse>> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
                 if (!isAdded() || getContext() == null) {
                     return; // Фрагмент отключен от активности
                 }

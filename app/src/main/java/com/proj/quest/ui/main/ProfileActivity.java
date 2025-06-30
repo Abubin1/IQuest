@@ -19,6 +19,8 @@ import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
 import com.proj.quest.leaderboard.LeaderboardActivity;
 import com.proj.quest.models.User;
+import com.proj.quest.models.Team;
+import com.proj.quest.models.Event;
 import com.proj.quest.ui.auth.LoginActivity;
 import com.proj.quest.ui.settings.ProfileSettingsActivity;
 import com.proj.quest.utils.SharedPrefs;
@@ -57,30 +59,86 @@ public class ProfileActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_riddles) {
-                startActivity(new Intent(this, RiddleActivity.class).putExtra("fragment", "riddles"));
-                overridePendingTransition(0,0);
-                finish();
+                SharedPrefs sharedPrefs = new SharedPrefs(this);
+                String token = sharedPrefs.getToken();
+                ApiService apiService = ApiClient.getApiService();
+                if (token == null || token.isEmpty()) {
+                    Toast.makeText(this, "Вы не авторизованы", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                apiService.getMyTeam("Bearer " + token).enqueue(new retrofit2.Callback<Team>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<Team> call, retrofit2.Response<Team> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            Team team = response.body();
+                            if (team.getEventId() == null || team.getEventId() == 0) {
+                                runOnUiThread(() -> Toast.makeText(ProfileActivity.this, "Группа еще не зарегистрировалась на мероприятие", Toast.LENGTH_SHORT).show());
+                                return;
+                            }
+                            apiService.getEvents("Bearer " + token).enqueue(new retrofit2.Callback<java.util.List<Event>>() {
+                                @Override
+                                public void onResponse(retrofit2.Call<java.util.List<Event>> call, retrofit2.Response<java.util.List<Event>> response) {
+                                    if (response.isSuccessful() && response.body() != null) {
+                                        java.util.List<Event> events = response.body();
+                                        long now = System.currentTimeMillis();
+                                        Event nearest = null;
+                                        for (Event event : events) {
+                                            if (event.getId() == team.getEventId()) {
+                                                try {
+                                                    java.text.SimpleDateFormat parser = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
+                                                    parser.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+                                                    java.util.Date eventDate = parser.parse(event.getStartDate());
+                                                    if (eventDate != null && eventDate.getTime() > now) {
+                                                        nearest = event;
+                                                        break;
+                                                    }
+                                                } catch (Exception ignored) {}
+                                            }
+                                        }
+                                        if (nearest != null) {
+                                            Intent intent = new Intent(ProfileActivity.this, RiddleActivity.class);
+                                            intent.putExtra("EVENT_ID", nearest.getId());
+                                            intent.putExtra("EVENT_TIME", nearest.getStartDate());
+                                            intent.putExtra("IS_REGISTERED", true);
+                                            startActivity(intent);
+                                        } else {
+                                            runOnUiThread(() -> Toast.makeText(ProfileActivity.this, "Нет ближайших мероприятий для вашей группы", Toast.LENGTH_SHORT).show());
+                                        }
+                                    } else {
+                                        runOnUiThread(() -> Toast.makeText(ProfileActivity.this, "Ошибка загрузки мероприятий", Toast.LENGTH_SHORT).show());
+                                    }
+                                }
+                                @Override
+                                public void onFailure(retrofit2.Call<java.util.List<Event>> call, Throwable t) {
+                                    runOnUiThread(() -> Toast.makeText(ProfileActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show());
+                                }
+                            });
+                        } else {
+                            runOnUiThread(() -> Toast.makeText(ProfileActivity.this, "Группа еще не зарегистрировалась на мероприятие", Toast.LENGTH_SHORT).show());
+                        }
+                    }
+                    @Override
+                    public void onFailure(retrofit2.Call<Team> call, Throwable t) {
+                        runOnUiThread(() -> Toast.makeText(ProfileActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show());
+                    }
+                });
                 return true;
             } else if (itemId == R.id.nav_leaders) {
-                startActivity(new Intent(this, LeaderboardActivity.class).putExtra("fragment", "leaders"));
+                startActivity(new Intent(this, LeaderboardActivity.class));
                 overridePendingTransition(0,0);
                 finish();
-                return true;
             } else if (itemId == R.id.nav_events) {
                 startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "events"));
                 overridePendingTransition(0,0);
                 finish();
-                return true;
             } else if (itemId == R.id.nav_groups) {
                 startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "groups"));
                 overridePendingTransition(0,0);
                 finish();
-                return true;
             } else if (itemId == R.id.nav_profile) {
-                // Уже находимся в профиле
                 return true;
             }
-            return false;
+            return true;
         });
 
         loadProfile();

@@ -1,0 +1,179 @@
+package com.proj.quest.ui.main;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+import com.proj.quest.R;
+import com.proj.quest.api.ApiClient;
+import com.proj.quest.api.ApiService;
+import com.proj.quest.models.CreateEventRequest;
+import com.proj.quest.models.Event;
+import com.proj.quest.models.RiddleRequest;
+import com.proj.quest.utils.FileUtils;
+import com.proj.quest.utils.SharedPrefs;
+
+import java.io.File;
+import java.io.IOException;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class EventPreviewActivity extends AppCompatActivity {
+
+    private CreateEventRequest eventRequest;
+    private TextView tvEventName, tvEventDescription, tvEventStartPlace, tvEventDateTime, tvMaxParticipants;
+    private LinearLayout riddlesContainer;
+    private Button btnConfirmAndCreate, btnSelectThemeImage;
+    private ImageView ivThemePreview;
+
+    private Uri selectedImageUri;
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_event_preview);
+
+        eventRequest = (CreateEventRequest) getIntent().getSerializableExtra("event_request");
+
+        if (eventRequest == null) {
+            Toast.makeText(this, "Ошибка: не удалось получить данные мероприятия.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
+        initViews();
+        populateData();
+        setupImagePicker();
+        setupButtons();
+    }
+
+    private void initViews() {
+        tvEventName = findViewById(R.id.tvEventName);
+        tvEventDescription = findViewById(R.id.tvEventDescription);
+        tvEventStartPlace = findViewById(R.id.tvEventStartPlace);
+        tvEventDateTime = findViewById(R.id.tvEventDateTime);
+        tvMaxParticipants = findViewById(R.id.tvMaxParticipants);
+        riddlesContainer = findViewById(R.id.riddlesContainer);
+        btnConfirmAndCreate = findViewById(R.id.btnConfirmAndCreate);
+        btnSelectThemeImage = findViewById(R.id.btnSelectThemeImage);
+        ivThemePreview = findViewById(R.id.ivThemePreview);
+    }
+
+    private void populateData() {
+        tvEventName.setText("Название: " + eventRequest.getName());
+        tvEventDescription.setText("Описание: " + eventRequest.getDescription());
+        tvEventStartPlace.setText("Место старта: " + eventRequest.getStart_place());
+        tvEventDateTime.setText("Дата и время: " + eventRequest.getEvent_time());
+        tvMaxParticipants.setText("Макс. участников: " + eventRequest.getMax_participants());
+
+        riddlesContainer.removeAllViews();
+        for (int i = 0; i < eventRequest.getRiddles().size(); i++) {
+            RiddleRequest riddle = eventRequest.getRiddles().get(i);
+            TextView riddleView = new TextView(this);
+            riddleView.setText(String.format("%d. %s (%f, %f)", i + 1, riddle.getRiddle_text(), riddle.getLatitude(), riddle.getLongitude()));
+            riddleView.setPadding(0, 8, 0, 8);
+            riddlesContainer.addView(riddleView);
+        }
+    }
+
+    private void setupImagePicker() {
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        selectedImageUri = result.getData().getData();
+                        Glide.with(this)
+                                .load(selectedImageUri)
+                                .centerCrop()
+                                .into(ivThemePreview);
+                    }
+                }
+        );
+    }
+
+    private void setupButtons() {
+        btnSelectThemeImage.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            imagePickerLauncher.launch(intent);
+        });
+
+        btnConfirmAndCreate.setOnClickListener(v -> {
+            if (selectedImageUri == null) {
+                Toast.makeText(this, "Пожалуйста, выберите фон для мероприятия.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            createEvent();
+        });
+    }
+
+    private RequestBody createPartFromString(String descriptionString) {
+        return RequestBody.create(MultipartBody.FORM, descriptionString);
+    }
+
+    private void createEvent() {
+        String token = new SharedPrefs(this).getToken();
+        if (token.isEmpty()) {
+            Toast.makeText(this, "Authentication error", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Устанавливаем URL изображения в запрос, если он выбран
+        if (selectedImageUri != null) {
+            // В реальном приложении здесь была бы логика загрузки файла на сервер
+            // и получения URL. Для простоты мы просто используем URI как строку.
+            // Это потребует изменений на сервере для обработки URI или Base64.
+            // Пока что, для примера, просто передадим строковое представление URI.
+            eventRequest.setTheme_url(selectedImageUri.toString());
+        }
+
+        ApiService apiService = ApiClient.getApiService();
+        apiService.createEvent("Bearer " + token, eventRequest)
+                .enqueue(new Callback<Event>() {
+                    @Override
+                    public void onResponse(Call<Event> call, Response<Event> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(EventPreviewActivity.this, "Мероприятие успешно создано!", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(EventPreviewActivity.this, MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            try {
+                                String errorBody = response.errorBody().string();
+                                Log.e("EventPreview", "Ошибка при создании мероприятия: " + errorBody);
+                                Toast.makeText(EventPreviewActivity.this, "Ошибка: " + errorBody, Toast.LENGTH_LONG).show();
+                            } catch (IOException e) {
+                                Log.e("EventPreview", "Ошибка при чтении ответа об ошибке", e);
+                                Toast.makeText(EventPreviewActivity.this, "Неизвестная ошибка на сервере", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Event> call, Throwable t) {
+                        Log.e("EventPreview", "Сетевая ошибка", t);
+                        Toast.makeText(EventPreviewActivity.this, "Сетевая ошибка: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+} 

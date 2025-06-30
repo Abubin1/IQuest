@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/button_background">
+
+    <TextView
+        android:id="@+id/riddleNumberTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Загадка №1"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"/>
+
+    <TextView
+        android:id="@+id/riddleTextTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Текст загадки будет здесь. Он может быть достаточно длинным, чтобы занимать несколько строк."
+        android:textSize="16sp"
+        android:textColor="@android:color/darker_gray"/>
+
+    <Button
+        android:id="@+id/showOnMapButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Показать на карте"
+        android:layout_gravity="end"/>
+
+</LinearLayout> 

@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
@@ -50,6 +52,7 @@ public class GroupActivity extends AppCompatActivity {
     private List<InviteResponse> invites = new ArrayList<>();
     private List<User> allUsers = new ArrayList<>();
     private List<Event> teamEvents = new ArrayList<>();
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,6 +73,8 @@ public class GroupActivity extends AppCompatActivity {
         
         System.out.println("DEBUG: GroupActivity onCreate - userId: " + userId);
         
+        progressBar = findViewById(R.id.progressBar);
+        showLoading(true);
         loadTeam();
         loadInvites();
         loadAllUsers();
@@ -91,13 +96,16 @@ public class GroupActivity extends AppCompatActivity {
 
     private void loadTeam() {
         String token = sharedPrefs.getToken();
+        // `showLoading(true)` вызывается в `onCreate` перед этим методом
         apiService.getMyTeam("Bearer " + token).enqueue(new Callback<Team>() {
             @Override
             public void onResponse(Call<Team> call, Response<Team> response) {
                 if (isFinishing() || isDestroyed()) {
                     return; // Активность уничтожена
                 }
-                
+
+                showLoading(false);
+
                 if (response.isSuccessful() && response.body() != null) {
                     currentTeam = response.body();
                     System.out.println("DEBUG: Team loaded successfully - " + currentTeam.getName() + ", Captain: " + currentTeam.getCaptainId() + ", User: " + userId);
@@ -109,21 +117,24 @@ public class GroupActivity extends AppCompatActivity {
                     } else {
                         btnDeleteGroup.setText("Покинуть группу");
                     }
-                } else if (response.code() == 404) {
-                    System.out.println("DEBUG: No team found for user " + userId);
-                    showCreateGroupUI();
                 } else {
-                    System.out.println("DEBUG: Error loading team - " + response.code());
-                    Toast.makeText(GroupActivity.this, "Ошибка загрузки команды", Toast.LENGTH_SHORT).show();
+                    // Если мы в GroupActivity, значит, группа должна существовать.
+                    // Если она не найдена, это ошибка. Не нужно переходить к созданию.
+                    System.out.println("DEBUG: Failed to load team in GroupActivity, code: " + response.code());
+                    Toast.makeText(GroupActivity.this, "Не удалось загрузить данные группы.", Toast.LENGTH_SHORT).show();
+                    finish(); // Возвращаемся на предыдущий экран
                 }
             }
+
             @Override
             public void onFailure(Call<Team> call, Throwable t) {
                 if (isFinishing() || isDestroyed()) {
                     return; // Активность уничтожена
                 }
+                showLoading(false);
                 System.out.println("DEBUG: Network error loading team - " + t.getMessage());
-                Toast.makeText(GroupActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+                Toast.makeText(GroupActivity.this, "Ошибка сети. Не удалось загрузить группу.", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }
@@ -161,7 +172,34 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     private void showTeamEvents() {
-        EventGroupAdapter adapter = new EventGroupAdapter(this, teamEvents, currentTeam.getEventId());
+        // Фильтруем ближайшее будущее мероприятие, если нет — последнее прошедшее
+        Event nearestFutureEvent = null;
+        Event lastPastEvent = null;
+        long now = System.currentTimeMillis();
+        for (Event event : teamEvents) {
+            if (event.getStartDate() != null) {
+                try {
+                    java.text.SimpleDateFormat parser = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
+                    parser.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+                    java.util.Date eventDate = parser.parse(event.getStartDate());
+                    if (eventDate != null) {
+                        if (eventDate.getTime() > now) {
+                            if (nearestFutureEvent == null || eventDate.getTime() < parser.parse(nearestFutureEvent.getStartDate()).getTime()) {
+                                nearestFutureEvent = event;
+                            }
+                        } else {
+                            if (lastPastEvent == null || eventDate.getTime() > parser.parse(lastPastEvent.getStartDate()).getTime()) {
+                                lastPastEvent = event;
+                            }
+                        }
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+        java.util.List<Event> filtered = new java.util.ArrayList<>();
+        if (nearestFutureEvent != null) filtered.add(nearestFutureEvent);
+        else if (lastPastEvent != null) filtered.add(lastPastEvent);
+        EventGroupAdapter adapter = new EventGroupAdapter(this, filtered, currentTeam.getEventId());
         eventsListView.setAdapter(adapter);
     }
 
@@ -398,30 +436,11 @@ public class GroupActivity extends AppCompatActivity {
                 if (isFinishing() || isDestroyed()) {
                     return; // Активность уничтожена
                 }
-                
                 if (response.isSuccessful()) {
                     Toast.makeText(GroupActivity.this, "Приглашение принято", Toast.LENGTH_SHORT).show();
                     loadInvites();
-                    loadTeam();
                 } else {
-                    // Обрабатываем ошибку от сервера
-                    try {
-                        String errorBody = response.errorBody().string();
-                        if (errorBody.contains("error")) {
-                            int startIndex = errorBody.indexOf("\"error\":\"") + 9;
-                            int endIndex = errorBody.lastIndexOf("\"");
-                            if (startIndex > 8 && endIndex > startIndex) {
-                                String errorMessage = errorBody.substring(startIndex, endIndex);
-                                showErrorDialog("Ошибка принятия приглашения", errorMessage);
-                            } else {
-                                showErrorDialog("Ошибка", "Ошибка принятия приглашения");
-                            }
-                        } else {
-                            showErrorDialog("Ошибка", "Ошибка принятия приглашения");
-                        }
-                    } catch (Exception e) {
-                        showErrorDialog("Ошибка", "Ошибка принятия приглашения");
-                    }
+                    showErrorDialog("Ошибка", "Ошибка принятия приглашения");
                 }
             }
             @Override
@@ -442,7 +461,6 @@ public class GroupActivity extends AppCompatActivity {
                 if (isFinishing() || isDestroyed()) {
                     return; // Активность уничтожена
                 }
-                
                 if (response.isSuccessful()) {
                     Toast.makeText(GroupActivity.this, "Приглашение отклонено", Toast.LENGTH_SHORT).show();
                     loadInvites();
@@ -468,7 +486,6 @@ public class GroupActivity extends AppCompatActivity {
                 if (isFinishing() || isDestroyed()) {
                     return; // Активность уничтожена
                 }
-                
                 if (response.isSuccessful() && response.body() != null) {
                     int userId = response.body().getId();
                     apiService.inviteUser("Bearer " + token, new InviteRequest(currentTeam.getId(), userId)).enqueue(new Callback<Void>() {
@@ -477,7 +494,6 @@ public class GroupActivity extends AppCompatActivity {
                             if (isFinishing() || isDestroyed()) {
                                 return; // Активность уничтожена
                             }
-                            
                             if (response.isSuccessful()) {
                                 Toast.makeText(GroupActivity.this, "Приглашение отправлено", Toast.LENGTH_SHORT).show();
                                 loadInvites();
@@ -485,22 +501,20 @@ public class GroupActivity extends AppCompatActivity {
                                 // Обрабатываем ошибку от сервера
                                 try {
                                     String errorBody = response.errorBody().string();
-                                    // Парсим JSON для получения сообщения об ошибке
                                     if (errorBody.contains("error")) {
-                                        // Простое извлечение сообщения об ошибке
                                         int startIndex = errorBody.indexOf("\"error\":\"") + 9;
                                         int endIndex = errorBody.lastIndexOf("\"");
                                         if (startIndex > 8 && endIndex > startIndex) {
                                             String errorMessage = errorBody.substring(startIndex, endIndex);
-                                            showErrorDialog("Ошибка приглашения", errorMessage);
+                                            Toast.makeText(GroupActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                                         } else {
-                                            showErrorDialog("Ошибка", "Ошибка отправки приглашения");
+                                            Toast.makeText(GroupActivity.this, "Ошибка отправки приглашения", Toast.LENGTH_SHORT).show();
                                         }
                                     } else {
-                                        showErrorDialog("Ошибка", "Ошибка отправки приглашения");
+                                        Toast.makeText(GroupActivity.this, "Ошибка отправки приглашения", Toast.LENGTH_SHORT).show();
                                     }
                                 } catch (Exception e) {
-                                    showErrorDialog("Ошибка", "Ошибка отправки приглашения");
+                                    Toast.makeText(GroupActivity.this, "Ошибка отправки приглашения", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }
@@ -509,11 +523,11 @@ public class GroupActivity extends AppCompatActivity {
                             if (isFinishing() || isDestroyed()) {
                                 return; // Активность уничтожена
                             }
-                            showErrorDialog("Ошибка сети", "Не удалось отправить приглашение. Проверьте подключение к интернету.");
+                            Toast.makeText(GroupActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } else {
-                    showErrorDialog("Пользователь не найден", "Пользователь с таким логином не найден в системе.");
+                    Toast.makeText(GroupActivity.this, "Пользователь не найден", Toast.LENGTH_SHORT).show();
                 }
             }
             @Override
@@ -521,7 +535,7 @@ public class GroupActivity extends AppCompatActivity {
                 if (isFinishing() || isDestroyed()) {
                     return; // Активность уничтожена
                 }
-                showErrorDialog("Ошибка поиска", "Не удалось найти пользователя. Проверьте подключение к интернету.");
+                Toast.makeText(GroupActivity.this, "Ошибка поиска пользователя", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -597,33 +611,24 @@ public class GroupActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-        bottomNav.setSelectedItemId(R.id.nav_groups); // Подсветка текущего пункта
+        bottomNav.setSelectedItemId(R.id.nav_groups); // Устанавливаем текущий элемент
 
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-
             if (itemId == R.id.nav_leaders) {
                 startActivity(new Intent(this, LeaderboardActivity.class));
                 overridePendingTransition(0, 0);
-                return true;
-            } else if (itemId == R.id.nav_riddles) {
-                startActivity(new Intent(this, MainActivity.class)
-                        .putExtra("fragment", "riddles"));
-                overridePendingTransition(0, 0);
                 finish();
                 return true;
+            } else if (itemId == R.id.nav_riddles) {
+                Toast.makeText(this, "Перейдите на страницу мероприятия, чтобы открыть загадки", Toast.LENGTH_SHORT).show();
+                return true;
             } else if (itemId == R.id.nav_events) {
-                startActivity(new Intent(this, MainActivity.class)
-                        .putExtra("fragment", "events"));
+                startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "events"));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
             } else if (itemId == R.id.nav_groups) {
-                // Переходим к GroupsFragment в MainActivity
-                startActivity(new Intent(this, MainActivity.class)
-                        .putExtra("fragment", "groups"));
-                overridePendingTransition(0, 0);
-                finish();
                 return true;
             } else if (itemId == R.id.nav_profile) {
                 startActivity(new Intent(this, ProfileActivity.class));
@@ -633,5 +638,19 @@ public class GroupActivity extends AppCompatActivity {
             }
             return false;
         });
+    }
+
+    private void showLoading(boolean loading) {
+        if (progressBar != null) progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
+        // Можно скрывать основной layout, если loading == true
+        findViewById(R.id.linearLayout).setVisibility(loading ? View.GONE : View.VISIBLE);
+        findViewById(R.id.cardView).setVisibility(loading ? View.GONE : View.VISIBLE);
+        findViewById(R.id.leaderboardTeams).setVisibility(loading ? View.GONE : View.VISIBLE);
+        findViewById(R.id.tvEventsTitle).setVisibility(loading ? View.GONE : View.VISIBLE);
+        findViewById(R.id.events_list).setVisibility(loading ? View.GONE : View.VISIBLE);
+        findViewById(R.id.tvParticipantsTitle).setVisibility(loading ? View.GONE : View.VISIBLE);
+        findViewById(R.id.users).setVisibility(loading ? View.GONE : View.VISIBLE);
+        findViewById(R.id.kick_group).setVisibility(loading ? View.GONE : View.VISIBLE);
+        findViewById(R.id.bottom_navigation).setVisibility(loading ? View.GONE : View.VISIBLE);
     }
 }

@@ -6,4 +6,9 @@
     </style>
 
     <style name="Theme.IQuest" parent="Base.Theme.IQuest" />
+
+    <style name="Theme.IQuest.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 </resources>

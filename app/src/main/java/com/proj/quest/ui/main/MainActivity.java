@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +16,11 @@ import com.proj.quest.Group.GroupActivity;
 import com.proj.quest.R;
 import com.proj.quest.Riddle.RiddleActivity;
 import com.proj.quest.leaderboard.LeaderboardActivity;
+import com.proj.quest.api.ApiClient;
+import com.proj.quest.api.ApiService;
+import com.proj.quest.models.Event;
+import com.proj.quest.models.Team;
+import com.proj.quest.utils.SharedPrefs;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     private BottomNavigationView bottomNavigationView;
@@ -72,20 +78,85 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         } else if (itemId == R.id.nav_profile) {
             startActivity(new Intent(this, ProfileActivity.class));
             overridePendingTransition(0, 0);
-            return false;
+            return true;
         }else if (itemId == R.id.nav_leaders) {
             startActivity(new Intent(this, LeaderboardActivity.class));
             overridePendingTransition(0, 0);
-            return false;
+            return true;
         } else if (itemId == R.id.nav_groups) {
             return loadFragment(new GroupsFragment());
         }else if (itemId == R.id.nav_riddles) {
-            startActivity(new Intent(this, RiddleActivity.class));
-            overridePendingTransition(0, 0);
-            return false;
+            // Получаем токен и ApiService
+            SharedPrefs sharedPrefs = new SharedPrefs(this);
+            String token = sharedPrefs.getToken();
+            ApiService apiService = ApiClient.getApiService();
+            if (token == null || token.isEmpty()) {
+                Toast.makeText(this, "Вы не авторизованы", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            apiService.getMyTeam("Bearer " + token).enqueue(new retrofit2.Callback<Team>() {
+                @Override
+                public void onResponse(retrofit2.Call<Team> call, retrofit2.Response<Team> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        Team team = response.body();
+                        if (team.getEventId() == null || team.getEventId() == 0) {
+                            runOnUiThread(() -> Toast.makeText(MainActivity.this, "Группа еще не зарегистрировалась на мероприятие", Toast.LENGTH_SHORT).show());
+                            return;
+                        }
+                        // Получаем все мероприятия
+                        apiService.getEvents("Bearer " + token).enqueue(new retrofit2.Callback<java.util.List<Event>>() {
+                            @Override
+                            public void onResponse(retrofit2.Call<java.util.List<Event>> call, retrofit2.Response<java.util.List<Event>> response) {
+                                if (response.isSuccessful() && response.body() != null) {
+                                    java.util.List<Event> events = response.body();
+                                    long now = System.currentTimeMillis();
+                                    Event nearest = null;
+                                    for (Event event : events) {
+                                        if (event.getId() == team.getEventId()) {
+                                            // Проверяем, что дата в будущем
+                                            try {
+                                                java.text.SimpleDateFormat parser = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
+                                                parser.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+                                                java.util.Date eventDate = parser.parse(event.getStartDate());
+                                                if (eventDate != null && eventDate.getTime() > now) {
+                                                    nearest = event;
+                                                    break;
+                                                }
+                                            } catch (Exception ignored) {}
+                                        }
+                                    }
+                                    if (nearest != null) {
+                                        Intent intent = new Intent(MainActivity.this, RiddleActivity.class);
+                                        intent.putExtra("EVENT_ID", nearest.getId());
+                                        intent.putExtra("EVENT_TIME", nearest.getStartDate());
+                                        intent.putExtra("IS_REGISTERED", true);
+                                        if (nearest.getThemeUrl() != null) {
+                                            intent.putExtra("EVENT_THEME_URL", nearest.getThemeUrl());
+                                        }
+                                        startActivity(intent);
+                                    } else {
+                                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "Нет ближайших мероприятий для вашей группы", Toast.LENGTH_SHORT).show());
+                                    }
+                                } else {
+                                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Ошибка загрузки мероприятий", Toast.LENGTH_SHORT).show());
+                                }
+                            }
+                            @Override
+                            public void onFailure(retrofit2.Call<java.util.List<Event>> call, Throwable t) {
+                                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show());
+                            }
+                        });
+                    } else {
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "Группа еще не зарегистрировалась на мероприятие", Toast.LENGTH_SHORT).show());
+                    }
+                }
+                @Override
+                public void onFailure(retrofit2.Call<Team> call, Throwable t) {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show());
+                }
+            });
+            return true;
         }
-
-        // Добавьте обработку других пунктов меню, если нужно
         return false;
     }
 }
