@@ -1,0 +1,54 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Базовая тема (Material 3) -->
+    <style name="Theme.MyApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Стандартные настройки -->
+    </style>
+
+    <!-- Тема 1 -->
+    <style name="Theme.MyApp.Theme1" parent="Theme.MyApp">
+        <item name="android:windowBackground">@drawable/back2</item>
+        <!-- Используем стандартные атрибуты Material 3 -->
+        <item name="colorSurfaceContainer">@color/bottom_nav_color_1</item>
+        <item name="android:statusBarColor">@color/bottom_nav_color_1</item>
+        <item name="colorPrimaryContainer">@color/bottom_nav_color_1</item>
+    </style>
+
+    <!-- Тема 2 -->
+    <style name="Theme.MyApp.Theme2" parent="Theme.MyApp">
+        <item name="android:windowBackground">@drawable/back3</item>
+        <item name="colorSurfaceContainer">@color/bottom_nav_color_2</item>
+        <item name="android:statusBarColor">@color/bottom_nav_color_2</item>
+        <item name="colorPrimaryContainer">@color/bottom_nav_color_2</item>
+    </style>
+
+    <!-- Тема 3 -->
+    <style name="Theme.MyApp.Theme3" parent="Theme.MyApp">
+        <item name="android:windowBackground">@drawable/back4</item>
+        <item name="colorSurfaceContainer">@color/bottom_nav_color_3</item>
+        <item name="android:statusBarColor">@color/bottom_nav_color_3</item>
+        <item name="colorPrimaryContainer">@color/bottom_nav_color_3</item>
+    </style>
+
+    <!-- Тема 4 -->
+    <style name="Theme.MyApp.Theme4" parent="Theme.MyApp">
+        <item name="android:windowBackground">@drawable/back5</item>
+        <item name="colorSurfaceContainer">@color/bottom_nav_color_4</item>
+        <item name="android:statusBarColor">@color/bottom_nav_color_4</item>
+        <item name="colorPrimaryContainer">@color/bottom_nav_color_4</item>
+    </style>
+
+    <!-- Тема 5 -->
+    <style name="Theme.MyApp.Theme5" parent="Theme.MyApp">
+        <item name="android:windowBackground">@drawable/back6</item>
+        <item name="colorSurfaceContainer">@color/bottom_nav_color_5</item>
+        <item name="android:statusBarColor">@color/bottom_nav_color_5</item>
+        <item name="colorPrimaryContainer">@color/bottom_nav_color_5</item>
+    </style>
+
+    <!-- Обновленный стиль для BottomNavigationView -->
+    <style name="BottomNavStyle" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">?attr/colorSurfaceContainer</item>
+        <item name="itemIconTint">?attr/colorOnPrimaryContainer</item>
+        <item name="itemTextColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+</resources>
