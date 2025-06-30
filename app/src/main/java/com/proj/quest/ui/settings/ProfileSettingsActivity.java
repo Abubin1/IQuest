@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.proj.quest.R;
+import com.proj.quest.Theme.BaseActivity;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
 import com.proj.quest.models.UpdateProfileRequest;
@@ -37,7 +38,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import android.util.Log;
 
-public class ProfileSettingsActivity extends AppCompatActivity {
+public class ProfileSettingsActivity extends BaseActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
     private ImageView ivAvatar;
     private EditText etLogin, etEmail, etPassword;

@@ -11,6 +11,7 @@
 
         <Button
             android:id="@+id/btnBack"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Назад"
@@ -28,6 +29,7 @@
 
         <Button
             android:id="@+id/btnChangeAvatar"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Сменить аватар"
@@ -59,6 +61,7 @@
 
         <Button
             android:id="@+id/btnSave"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Сохранить"

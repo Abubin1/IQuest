@@ -73,6 +73,7 @@
             <Button
                 android:id="@+id/btnProfileSettings"
                 android:layout_width="match_parent"
+                android:backgroundTint="?attr/colorButtonNormal"
                 android:layout_height="wrap_content"
                 android:text="Настройки профиля"
                 android:layout_marginTop="16dp" />
@@ -80,9 +81,17 @@
             <Button
                 android:id="@+id/logoutBtn"
                 android:layout_width="match_parent"
+                android:backgroundTint="?attr/colorButtonNormal"
                 android:layout_height="wrap_content"
                 android:text="Выйти из аккаунта"
                 android:drawableLeft="@android:drawable/ic_lock_power_off"
+                android:layout_marginTop="8dp" />
+            <Button
+                android:id="@+id/ThemeButton"
+                android:layout_width="match_parent"
+                android:backgroundTint="?attr/colorButtonNormal"
+                android:layout_height="wrap_content"
+                android:text="Сменить тему"
                 android:layout_marginTop="8dp" />
         </LinearLayout>
     </ScrollView>

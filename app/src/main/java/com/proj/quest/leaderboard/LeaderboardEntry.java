@@ -1,6 +1,8 @@
 package com.proj.quest.leaderboard;
 
-public class LeaderboardEntry {
+import com.proj.quest.Theme.BaseActivity;
+
+public class LeaderboardEntry extends BaseActivity{
     private String name;
     private int score;
     private String avatarUrl;

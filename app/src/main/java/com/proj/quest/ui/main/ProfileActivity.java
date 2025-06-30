@@ -4,27 +4,33 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.proj.quest.Theme.ThemeHelper;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.proj.quest.R;
+import com.proj.quest.Theme.BaseActivity;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
 import com.proj.quest.models.User;
 import com.proj.quest.ui.auth.LoginActivity;
+import com.proj.quest.leaderboard.LeaderboardActivity;
 import com.proj.quest.ui.settings.ProfileSettingsActivity;
 import com.proj.quest.utils.SharedPrefs;
-
+import android.view.MenuItem;
+import android.view.View;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends BaseActivity {
+
+    private int currentThemeIndex = 0;
     private ImageView profileImage;
     private Button logoutBtn;
     private ApiService apiService;
@@ -37,6 +43,36 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        Button btnChangeTheme = findViewById(R.id.ThemeButton);
+        currentThemeIndex = ThemeHelper.getSavedTheme(this);
+
+        // Создаем меню для выбора темы
+        PopupMenu themeMenu = new PopupMenu(this, btnChangeTheme);
+
+        // Добавляем пункты меню
+        for (int i = 0; i < ThemeHelper.APP_THEMES.length; i++) {
+            themeMenu.getMenu().add(0, i, i, "Тема " + (i + 1));
+        }
+
+        // Обработчик выбора темы
+        themeMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                currentThemeIndex = item.getItemId();
+                ThemeHelper.saveTheme(ProfileActivity.this, currentThemeIndex);
+                recreate();
+                return true;
+            }
+        });
+
+        // Открываем меню при нажатии на кнопку
+        btnChangeTheme.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                themeMenu.show();
+            }
+        });
 
         profileImage = findViewById(R.id.profileImage);
         logoutBtn = findViewById(R.id.logoutBtn);
@@ -74,7 +110,6 @@ public class ProfileActivity extends AppCompatActivity {
                 finish();
                 return true;
             } else if (itemId == R.id.nav_profile) {
-                // Уже находимся в профиле
                 return true;
             }
             return false;
@@ -132,16 +167,16 @@ public class ProfileActivity extends AppCompatActivity {
                     String avatarUrl = sharedPrefs.getAvatarUrl();
                     if ((avatarUrl != null && !avatarUrl.isEmpty())) {
                         Glide.with(ProfileActivity.this)
-                            .load(avatarUrl.startsWith("http") ? avatarUrl : "http://5.175.92.194:3000" + avatarUrl)
-                            .placeholder(R.drawable.profile)
-                            .error(R.drawable.profile)
-                            .into(profileImage);
+                                .load(avatarUrl.startsWith("http") ? avatarUrl : "http://5.175.92.194:3000" + avatarUrl)
+                                .placeholder(R.drawable.profile)
+                                .error(R.drawable.profile)
+                                .into(profileImage);
                     } else if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
                         Glide.with(ProfileActivity.this)
-                            .load(user.getAvatarUrl().startsWith("http") ? user.getAvatarUrl() : "http://5.175.92.194:3000" + user.getAvatarUrl())
-                            .placeholder(R.drawable.profile)
-                            .error(R.drawable.profile)
-                            .into(profileImage);
+                                .load(user.getAvatarUrl().startsWith("http") ? user.getAvatarUrl() : "http://5.175.92.194:3000" + user.getAvatarUrl())
+                                .placeholder(R.drawable.profile)
+                                .error(R.drawable.profile)
+                                .into(profileImage);
                     } else {
                         profileImage.setImageResource(R.drawable.profile);
                     }
@@ -168,4 +203,4 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
-} 
+}

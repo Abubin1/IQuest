@@ -13,20 +13,24 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.proj.quest.R;
+import com.proj.quest.Theme.BaseActivity;
 import com.proj.quest.leaderboard.LeaderboardActivity;
 import com.proj.quest.models.Team;
 import com.proj.quest.ui.main.EventsFragment;
 import com.proj.quest.ui.main.MainActivity;
 import com.proj.quest.ui.main.ProfileActivity;
 
-public class CreateGroupActivity extends AppCompatActivity {
+public class CreateGroupActivity extends BaseActivity {
     private Button btnCreateGroup;
+
     private EditText etNameGroup;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_group);
+
+
 
         Button test = findViewById(R.id.btnOfflineGroup);
         btnCreateGroup = findViewById(R.id.btnCreateGroup);

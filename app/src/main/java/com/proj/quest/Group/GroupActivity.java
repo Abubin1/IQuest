@@ -28,6 +28,7 @@ public class GroupActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group);
 
@@ -91,7 +92,7 @@ public class GroupActivity extends AppCompatActivity {
         ListView tableTeams = findViewById(R.id.listLeaderboardTeams);
 
         dialog.findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
-        
+
         dialog.show();
     }
 
