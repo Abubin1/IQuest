@@ -99,35 +99,63 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 public void onResponse(retrofit2.Call<Team> call, retrofit2.Response<Team> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         Team team = response.body();
-                        if (team.getEventId() == null || team.getEventId() == 0) {
-                            runOnUiThread(() -> Toast.makeText(MainActivity.this, "Группа еще не зарегистрировалась на мероприятие", Toast.LENGTH_SHORT).show());
+                        if (team.getId() <= 0) {
+                            Intent intent = new Intent(MainActivity.this, RiddleActivity.class);
+                            intent.putExtra("IS_REGISTERED", false);
+                            startActivity(intent);
                             return;
                         }
-                        // Получаем все мероприятия
-                        apiService.getEvents("Bearer " + token).enqueue(new retrofit2.Callback<java.util.List<Event>>() {
+                        // Получаем все мероприятия для команды
+                        apiService.getTeamEvents("Bearer " + token, team.getId()).enqueue(new retrofit2.Callback<java.util.List<Event>>() {
                             @Override
                             public void onResponse(retrofit2.Call<java.util.List<Event>> call, retrofit2.Response<java.util.List<Event>> response) {
                                 if (response.isSuccessful() && response.body() != null) {
-                                    java.util.List<Event> events = response.body();
-                                    Event registeredEvent = null;
-                                    for (Event event : events) {
-                                        if (event.getId() == team.getEventId()) {
-                                            registeredEvent = event;
-                                            break;
-                                        }
-                                    }
-                                    if (registeredEvent != null) {
+                                    java.util.List<Event> registeredEvents = response.body();
+                                    if (registeredEvents.isEmpty()) {
                                         Intent intent = new Intent(MainActivity.this, RiddleActivity.class);
-                                        intent.putExtra("EVENT_ID", registeredEvent.getId());
-                                        String eventDateTime = registeredEvent.getStartDate() + "T" + registeredEvent.getStartTime() + ".000Z";
+                                        intent.putExtra("IS_REGISTERED", false);
+                                        startActivity(intent);
+                                        return;
+                                    }
+                                    // Ищем ближайшее (сейчас идет или ближайшее будущее)
+                                    Event bestEvent = null;
+                                    long now = System.currentTimeMillis();
+                                    long minDiff = Long.MAX_VALUE;
+                                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
+                                    sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+                                    for (Event event : registeredEvents) {
+                                        String eventDateTime = event.getStartDate() + "T" + event.getStartTime() + ".000Z";
+                                        try {
+                                            java.util.Date eventDate = sdf.parse(eventDateTime);
+                                            long eventStart = eventDate.getTime();
+                                            long eventEnd = eventStart + 3 * 60 * 60 * 1000;
+                                            if (now >= eventStart && now < eventEnd) {
+                                                // Если мероприятие идет — оно приоритетно
+                                                bestEvent = event;
+                                                break;
+                                            } else if (eventStart > now) {
+                                                long diff = eventStart - now;
+                                                if (diff < minDiff) {
+                                                    minDiff = diff;
+                                                    bestEvent = event;
+                                                }
+                                            }
+                                        } catch (Exception ignore) {}
+                                    }
+                                    if (bestEvent != null) {
+                                        String eventDateTime = bestEvent.getStartDate() + "T" + bestEvent.getStartTime() + ".000Z";
+                                        Intent intent = new Intent(MainActivity.this, RiddleActivity.class);
+                                        intent.putExtra("EVENT_ID", bestEvent.getId());
                                         intent.putExtra("EVENT_TIME", eventDateTime);
                                         intent.putExtra("IS_REGISTERED", true);
-                                        if (registeredEvent.getThemeUrl() != null) {
-                                            intent.putExtra("EVENT_THEME_URL", registeredEvent.getThemeUrl());
+                                        if (bestEvent.getThemeUrl() != null) {
+                                            intent.putExtra("EVENT_THEME_URL", bestEvent.getThemeUrl());
                                         }
                                         startActivity(intent);
                                     } else {
-                                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "Мероприятие, на которое зарегистрирована группа, не найдено", Toast.LENGTH_SHORT).show());
+                                        Intent intent = new Intent(MainActivity.this, RiddleActivity.class);
+                                        intent.putExtra("IS_REGISTERED", false);
+                                        startActivity(intent);
                                     }
                                 } else {
                                     runOnUiThread(() -> Toast.makeText(MainActivity.this, "Ошибка загрузки мероприятий", Toast.LENGTH_SHORT).show());
@@ -139,7 +167,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                             }
                         });
                     } else {
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "Группа еще не зарегистрировалась на мероприятие", Toast.LENGTH_SHORT).show());
+                        Intent intent = new Intent(MainActivity.this, RiddleActivity.class);
+                        intent.putExtra("IS_REGISTERED", false);
+                        startActivity(intent);
                     }
                 }
                 @Override

@@ -224,5 +224,13 @@
             android:background="@android:color/holo_blue_dark"
             android:textColor="@android:color/white"/>
 
+        <Button
+            android:id="@+id/btnTeamLeaderboard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Список команд с баллами"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"/>
+
     </LinearLayout>
 </ScrollView> 

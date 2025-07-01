@@ -186,18 +186,21 @@ public class EventsFragment extends Fragment {
                     break;
                 }
             }
-            // Мероприятие завершено, если прошло более 3 часов с начала
-            if (now.getTime() > eventDate.getTime() + 3 * 60 * 60 * 1000) {
+            long eventStart = eventDate.getTime();
+            long eventEnd = eventStart + 3 * 60 * 60 * 1000; // +3 часа
+            if (now.getTime() > eventEnd) {
                 finishedEvents.add(event);
+                continue;
+            }
+            // Если мероприятие идет сейчас — оно текущее и не попадает в futureEvents
+            if (isRegistered && now.getTime() >= eventStart && now.getTime() < eventEnd) {
+                nearestUserEvent = event;
                 continue;
             }
             if (eventDate.after(now)) {
                 futureEvents.add(event);
-                if (isRegistered) {
-                    Date nearestEventDate = (nearestUserEvent != null) ? parseStartDateTime(nearestUserEvent.getStartDate(), nearestUserEvent.getStartTime()) : null;
-                    if (nearestEventDate == null || eventDate.before(nearestEventDate)) {
-                        nearestUserEvent = event;
-                    }
+                if (isRegistered && nearestUserEvent == null) {
+                    nearestUserEvent = event;
                 }
             }
         }
@@ -230,7 +233,7 @@ public class EventsFragment extends Fragment {
         if (date == null || time == null) return null;
         String dateTime = date + "T" + time + ".000Z";
         SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        parser.setTimeZone(TimeZone.getDefault());
+        parser.setTimeZone(TimeZone.getTimeZone("UTC"));
         try {
             return parser.parse(dateTime);
         } catch (ParseException e) {

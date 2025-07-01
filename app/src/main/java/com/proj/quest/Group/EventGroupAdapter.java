@@ -61,8 +61,17 @@ public class EventGroupAdapter extends BaseAdapter {
         
         // Определяем статус мероприятия
         if (currentEventId != null && currentEventId.equals(event.getId())) {
-            tvEventStatus.setText("Ближайшее мероприятие");
-            tvEventStatus.setTextColor(context.getResources().getColor(android.R.color.holo_blue_dark));
+            // Проверяем, идет ли мероприятие сейчас
+            Date now = new Date();
+            long eventStart = eventDate != null ? eventDate.getTime() : 0;
+            long eventEnd = eventStart + 3 * 60 * 60 * 1000; // +3 часа
+            if (now.getTime() >= eventStart && now.getTime() <= eventEnd) {
+                tvEventStatus.setText("Текущее мероприятие");
+                tvEventStatus.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
+            } else {
+                tvEventStatus.setText("Ближайшее мероприятие");
+                tvEventStatus.setTextColor(context.getResources().getColor(android.R.color.holo_blue_dark));
+            }
             // Выделяем фон и текст
             view.setBackgroundColor(Color.parseColor("#E3F2FD"));
             tvEventName.setTextColor(Color.parseColor("#1976D2"));

@@ -41,7 +41,22 @@ public class RegisterActivity extends AppCompatActivity {
             String password = etPassword.getText().toString().trim();
 
             if (login.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Заполните все поля", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.error_fill_all_fields), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!login.matches("[A-Za-z0-9]+")) {
+                Toast.makeText(this, getString(R.string.error_login_latin), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(this, getString(R.string.error_email_format), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (password.length() < 6) {
+                Toast.makeText(this, getString(R.string.error_password_length), Toast.LENGTH_SHORT).show();
                 return;
             }
 

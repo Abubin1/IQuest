@@ -76,4 +76,30 @@ public class FileUtils {
         }
         return null;
     }
+
+    public static File getFileFromUri(Context context, Uri uri) {
+        if (uri == null) return null;
+        if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return new File(uri.getPath());
+        } else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            try {
+                InputStream inputStream = context.getContentResolver().openInputStream(uri);
+                String fileName = "temp_" + System.currentTimeMillis();
+                File tempFile = new File(context.getCacheDir(), fileName);
+                OutputStream outputStream = new FileOutputStream(tempFile);
+                byte[] buf = new byte[4096];
+                int len;
+                while ((len = inputStream.read(buf)) > 0) {
+                    outputStream.write(buf, 0, len);
+                }
+                outputStream.close();
+                inputStream.close();
+                return tempFile;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        return null;
+    }
 } 

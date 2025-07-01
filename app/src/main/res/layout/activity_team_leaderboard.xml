@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/leaderboard_background">
+
+    <TextView
+        android:id="@+id/team_leaderboard_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/leaderboard_header"
+        android:text="Командный рейтинг"
+        android:textColor="@color/leaderboard_text"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:padding="16dp"/>
+
+    <LinearLayout
+        android:id="@+id/team_columns_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/team_leaderboard_header"
+        android:background="#E1F5FE"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Место"
+            android:textColor="@color/leaderboard_text"
+            android:textStyle="bold"
+            android:minWidth="48dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="16dp"
+            android:text="Команда"
+            android:textColor="@color/leaderboard_text"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="Баллы"
+            android:textColor="@color/leaderboard_text"
+            android:textStyle="bold"
+            android:minWidth="64dp"/>
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/teamLeaderboardListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/team_columns_header"
+        android:divider="@null"
+        android:dividerHeight="1dp"
+        android:footerDividersEnabled="false"
+        android:headerDividersEnabled="false"/>
+
+    <Button
+        android:id="@+id/awardPointsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Начислить баллы"
+        android:layout_margin="16dp"
+        android:layout_gravity="bottom" />
+</RelativeLayout> 

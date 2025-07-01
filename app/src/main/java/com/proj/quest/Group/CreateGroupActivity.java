@@ -22,6 +22,7 @@ import com.proj.quest.ui.main.EventsFragment;
 import com.proj.quest.ui.main.MainActivity;
 import com.proj.quest.ui.main.ProfileActivity;
 import com.proj.quest.utils.SharedPrefs;
+import com.proj.quest.utils.NavigationUtils;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -109,10 +110,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 return true;
             } else if (itemId == R.id.nav_riddles) {
-                startActivity(new Intent(this, MainActivity.class)
-                        .putExtra("fragment", "riddles"));
-                overridePendingTransition(0, 0);
-                finish();
+                com.proj.quest.utils.NavigationUtils.goToRiddles(this);
                 return true;
             } else if (itemId == R.id.nav_events) {
                 startActivity(new Intent(this, MainActivity.class)

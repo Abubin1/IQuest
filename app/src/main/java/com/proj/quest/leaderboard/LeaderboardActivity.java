@@ -15,6 +15,7 @@ import com.proj.quest.ui.main.ProfileActivity;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
 import com.proj.quest.models.User;
+import com.proj.quest.utils.NavigationUtils;
 
 import java.util.List;
 
@@ -93,7 +94,7 @@ public class LeaderboardActivity extends AppCompatActivity {
             if (itemId == R.id.nav_leaders) {
                 return true;
             } else if (itemId == R.id.nav_riddles) {
-                Toast.makeText(this, "Перейдите на страницу мероприятия, чтобы открыть загадки", Toast.LENGTH_SHORT).show();
+                NavigationUtils.goToRiddles(this);
                 return true;
             } else if (itemId == R.id.nav_events) {
                 startActivity(new Intent(this, MainActivity.class)

@@ -33,7 +33,8 @@
     <string name="cancel_button">Отмена</string>
     <string name="confirm_button">Подтвердить</string>
     <string name="register_button_text">Зарегистрироваться</string>
-    <string name="registered_button_text">Зарегистрированы</string>
+    <string name="registered_button_text">Уже зарегистрированы</string>
+    <string name="event_finished">Регистрация завершена</string>
 
     <!-- Navigation -->
     <string name="menu_events">Мероприятия</string>
@@ -49,6 +50,10 @@
     <string name="error_team_registration">Ошибка регистрации команды на мероприятие</string>
     <string name="error_load_event">Ошибка загрузки мероприятия</string>
     <string name="need_login">Необходимо войти в систему</string>
+    <string name="error_fill_all_fields">Заполните все поля</string>
+    <string name="error_login_latin">Логин должен содержать только латинские буквы и цифры</string>
+    <string name="error_email_format">Введите корректный email</string>
+    <string name="error_password_length">Пароль должен быть не менее 6 символов</string>
 
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="title_activity_profile_settings">Настройки профиля</string>
@@ -56,4 +61,6 @@
     <string name="title_activity_group">Группа</string>
     <string name="title_activity_create_group">Создание группы</string>
     <string name="title_activity_riddle">Загадки</string>
+    <string name="only_captain_can_check">Проверку может проводить только капитан команды</string>
+    <string name="check_button_text">Проверить</string>
 </resources>

@@ -23,6 +23,7 @@ import com.proj.quest.Group.CreateGroupActivity;
 import com.proj.quest.utils.SharedPrefs;
 import com.proj.quest.ui.adapters.TeamMemberSelectionAdapter;
 
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,6 +62,17 @@ public class EventDetailsActivity extends AppCompatActivity {
         setupViews();
         loadEventDetails();
         loadRegisteredTeams();
+
+        // --- ДОБАВЛЕНО: Проверка завершённости мероприятия и регистрации команды ---
+        checkRegistrationAndEventStatus();
+        // --- КОНЕЦ ДОБАВЛЕНИЯ ---
+
+        Button btnTeamLeaderboard = findViewById(R.id.btnTeamLeaderboard);
+        btnTeamLeaderboard.setOnClickListener(v -> {
+            Intent intent = new Intent(this, com.proj.quest.leaderboard.TeamLeaderboardActivity.class);
+            intent.putExtra("eventId", event.getId());
+            startActivity(intent);
+        });
     }
 
     private void setupViews() {
@@ -102,7 +114,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         if (date == null || time == null) return null;
         String dateTime = date + "T" + time + ".000Z";
         SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        parser.setTimeZone(TimeZone.getDefault());
+        parser.setTimeZone(TimeZone.getTimeZone("UTC"));
         try {
             return parser.parse(dateTime);
         } catch (ParseException e) {
@@ -129,11 +141,11 @@ public class EventDetailsActivity extends AppCompatActivity {
                     long registeredCount = 0;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                         registeredCount = allTeams.stream()
-                                .filter(team -> team.getEventId() != null && team.getEventId() == event.getId())
+                                .filter(team -> team.getEventId() != null && team.getEventId().equals(event.getId()))
                                 .count();
                     } else {
                         for (Team team : allTeams) {
-                            if (team.getEventId() != null && team.getEventId() == event.getId()) {
+                            if (team.getEventId() != null && team.getEventId().equals(event.getId())) {
                                 registeredCount++;
                             }
                         }
@@ -334,6 +346,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                 } else {
                     System.out.println("DEBUG: Team registration failed - " + response.code());
                     showErrorDialog("Ошибка", getString(R.string.error_team_registration));
+                    checkRegistrationAndEventStatus();
                 }
             }
             @Override
@@ -343,6 +356,50 @@ public class EventDetailsActivity extends AppCompatActivity {
                 }
                 System.out.println("DEBUG: Network error during registration - " + t.getMessage());
                 showErrorDialog(getString(R.string.error_network), "Не удалось зарегистрировать команду. Проверьте подключение к интернету.");
+            }
+        });
+    }
+
+    // --- ДОБАВЛЕНО: Метод проверки регистрации и завершённости мероприятия ---
+    private void checkRegistrationAndEventStatus() {
+        // Проверка завершённости мероприятия
+        Date eventDate = parseStartDateTime(event.getStartDate(), event.getStartTime());
+        boolean isEventFinished = false;
+        if (eventDate != null) {
+            long eventStart = eventDate.getTime();
+            long eventEnd = eventStart + 3 * 60 * 60 * 1000; // +3 часа
+            Date now = new Date();
+            if (now.getTime() > eventEnd) {
+                isEventFinished = true;
+            }
+        }
+        if (isEventFinished) {
+            btnRegister.setEnabled(false);
+            btnRegister.setText(getString(R.string.event_finished));
+            return;
+        }
+        // Проверка, зарегистрирована ли команда на это мероприятие
+        String token = sharedPrefs.getToken();
+        if (token == null || token.isEmpty()) {
+            return;
+        }
+        apiService.getMyTeam("Bearer " + token).enqueue(new Callback<Team>() {
+            @Override
+            public void onResponse(Call<Team> call, Response<Team> response) {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                if (response.isSuccessful() && response.body() != null) {
+                    Team team = response.body();
+                    if (team.getEventId() != null && team.getEventId().equals(event.getId())) {
+                        btnRegister.setEnabled(false);
+                        btnRegister.setText(getString(R.string.registered_button_text));
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<Team> call, Throwable t) {
+                // ничего не делаем
             }
         });
     }

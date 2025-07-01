@@ -127,6 +127,7 @@ public class CreateEventActivity extends AppCompatActivity {
         }
         
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
         String formattedDateTime = sdf.format(selectedDate.getTime());
 
         // Переход на CreateRiddlesActivity

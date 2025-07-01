@@ -33,6 +33,7 @@ import com.proj.quest.models.User;
 import com.proj.quest.ui.main.MainActivity;
 import com.proj.quest.ui.main.ProfileActivity;
 import com.proj.quest.utils.SharedPrefs;
+import com.proj.quest.utils.NavigationUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -172,27 +173,35 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     private void showTeamEvents() {
-        // Показываем только ближайшее мероприятие, на которое записана команда
-        Event nearestFutureEvent = null;
+        // Показываем только текущее или ближайшее мероприятие
+        Event currentOrNextEvent = null;
         long now = System.currentTimeMillis();
         for (Event event : teamEvents) {
-            if (event.getStartDate() != null && event.getId() == (currentTeam != null && currentTeam.getEventId() != null ? currentTeam.getEventId() : -1)) {
+            if (event.getStartDate() != null && event.getStartTime() != null) {
                 try {
                     String dateTime = event.getStartDate() + "T" + event.getStartTime() + ".000Z";
                     java.text.SimpleDateFormat parser = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
                     parser.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-                    java.util.Date eventDate = parser.parse(dateTime);
-                    if (eventDate != null && eventDate.getTime() > now) {
-                        if (nearestFutureEvent == null || eventDate.getTime() < parser.parse(nearestFutureEvent.getStartDate() + "T" + nearestFutureEvent.getStartTime() + ".000Z").getTime()) {
-                            nearestFutureEvent = event;
+                    java.util.Date eventStart = parser.parse(dateTime);
+                    // Предположим, что мероприятие длится 2 часа (или добавить поле endTime, если есть)
+                    long eventDuration = 2 * 60 * 60 * 1000L;
+                    long eventEnd = eventStart.getTime() + eventDuration;
+                    if (now >= eventStart.getTime() && now < eventEnd) {
+                        // Мероприятие идет сейчас
+                        currentOrNextEvent = event;
+                        break;
+                    } else if (eventStart.getTime() > now) {
+                        // Ближайшее будущее мероприятие (если нет текущего)
+                        if (currentOrNextEvent == null || eventStart.getTime() < parser.parse(currentOrNextEvent.getStartDate() + "T" + currentOrNextEvent.getStartTime() + ".000Z").getTime()) {
+                            currentOrNextEvent = event;
                         }
                     }
                 } catch (Exception ignored) {}
             }
         }
         List<Event> filtered = new ArrayList<>();
-        if (nearestFutureEvent != null) filtered.add(nearestFutureEvent);
-        EventGroupAdapter adapter = new EventGroupAdapter(this, filtered, nearestFutureEvent != null ? nearestFutureEvent.getId() : null);
+        if (currentOrNextEvent != null) filtered.add(currentOrNextEvent);
+        EventGroupAdapter adapter = new EventGroupAdapter(this, filtered, currentOrNextEvent != null ? currentOrNextEvent.getId() : null);
         eventsListView.setAdapter(adapter);
     }
 
@@ -614,7 +623,7 @@ public class GroupActivity extends AppCompatActivity {
                 finish();
                 return true;
             } else if (itemId == R.id.nav_riddles) {
-                Toast.makeText(this, "Перейдите на страницу мероприятия, чтобы открыть загадки", Toast.LENGTH_SHORT).show();
+                NavigationUtils.goToRiddles(this);
                 return true;
             } else if (itemId == R.id.nav_events) {
                 startActivity(new Intent(this, MainActivity.class).putExtra("fragment", "events"));

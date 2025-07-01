@@ -15,6 +15,7 @@ import com.proj.quest.models.InviteResponse;
 import com.proj.quest.models.KickRequest;
 import com.proj.quest.models.CreateEventRequest;
 import com.proj.quest.models.RiddleRequest;
+import com.proj.quest.models.ThemeUploadResponse;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -152,4 +153,14 @@ public interface ApiService {
 
     @GET("api/teams")
     Call<List<Team>> getTeams(@Header("Authorization") String token);
+
+    @Multipart
+    @POST("api/events/theme")
+    Call<ThemeUploadResponse> uploadEventTheme(@Header("Authorization") String token, @Part MultipartBody.Part theme);
+
+    @GET("team-leaderboard")
+    Call<List<com.proj.quest.models.TeamLeaderboardEntry>> getTeamLeaderboard(@Header("Authorization") String token, @Query("eventId") int eventId);
+
+    @POST("api/events/{eventId}/award-points")
+    Call<Void> awardPointsForEvent(@Header("Authorization") String token, @Path("eventId") int eventId);
 }

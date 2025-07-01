@@ -23,6 +23,7 @@ import com.proj.quest.api.ApiService;
 import com.proj.quest.models.CreateEventRequest;
 import com.proj.quest.models.Event;
 import com.proj.quest.models.RiddleRequest;
+import com.proj.quest.models.ThemeUploadResponse;
 import com.proj.quest.utils.FileUtils;
 import com.proj.quest.utils.SharedPrefs;
 
@@ -136,44 +137,66 @@ public class EventPreviewActivity extends AppCompatActivity {
             Toast.makeText(this, "Authentication error", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        // Устанавливаем URL изображения в запрос, если он выбран
-        if (selectedImageUri != null) {
-            // В реальном приложении здесь была бы логика загрузки файла на сервер
-            // и получения URL. Для простоты мы просто используем URI как строку.
-            // Это потребует изменений на сервере для обработки URI или Base64.
-            // Пока что, для примера, просто передадим строковое представление URI.
-            eventRequest.setTheme_url(selectedImageUri.toString());
+        if (selectedImageUri == null) {
+            Toast.makeText(this, "Пожалуйста, выберите фон для мероприятия.", Toast.LENGTH_SHORT).show();
+            return;
         }
+        // 1. Загружаем файл на сервер
+        File file = FileUtils.getFileFromUri(this, selectedImageUri);
+        if (file == null) {
+            Toast.makeText(this, "Ошибка выбора файла.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("theme", file.getName(), requestFile);
+        ApiService apiService = ApiClient.getApiService();
+        apiService.uploadEventTheme("Bearer " + token, body)
+            .enqueue(new Callback<ThemeUploadResponse>() {
+                @Override
+                public void onResponse(Call<ThemeUploadResponse> call, Response<ThemeUploadResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        String themeUrl = response.body().getTheme_url();
+                        eventRequest.setTheme_url(themeUrl);
+                        createEventWithThemeUrl(eventRequest, token);
+                    } else {
+                        Toast.makeText(EventPreviewActivity.this, "Ошибка загрузки фона.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(Call<ThemeUploadResponse> call, Throwable t) {
+                    Toast.makeText(EventPreviewActivity.this, "Ошибка сети при загрузке фона.", Toast.LENGTH_SHORT).show();
+                }
+            });
+    }
 
+    private void createEventWithThemeUrl(CreateEventRequest eventRequest, String token) {
         ApiService apiService = ApiClient.getApiService();
         apiService.createEvent("Bearer " + token, eventRequest)
-                .enqueue(new Callback<Event>() {
-                    @Override
-                    public void onResponse(Call<Event> call, Response<Event> response) {
-                        if (response.isSuccessful()) {
-                            Toast.makeText(EventPreviewActivity.this, "Мероприятие успешно создано!", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(EventPreviewActivity.this, MainActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            try {
-                                String errorBody = response.errorBody().string();
-                                Log.e("EventPreview", "Ошибка при создании мероприятия: " + errorBody);
-                                Toast.makeText(EventPreviewActivity.this, "Ошибка: " + errorBody, Toast.LENGTH_LONG).show();
-                            } catch (IOException e) {
-                                Log.e("EventPreview", "Ошибка при чтении ответа об ошибке", e);
-                                Toast.makeText(EventPreviewActivity.this, "Неизвестная ошибка на сервере", Toast.LENGTH_LONG).show();
-                            }
+            .enqueue(new Callback<Event>() {
+                @Override
+                public void onResponse(Call<Event> call, Response<Event> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(EventPreviewActivity.this, "Мероприятие успешно создано!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(EventPreviewActivity.this, MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        try {
+                            String errorBody = response.errorBody().string();
+                            Log.e("EventPreview", "Ошибка при создании мероприятия: " + errorBody);
+                            Toast.makeText(EventPreviewActivity.this, "Ошибка: " + errorBody, Toast.LENGTH_LONG).show();
+                        } catch (IOException e) {
+                            Log.e("EventPreview", "Ошибка при чтении ответа об ошибке", e);
+                            Toast.makeText(EventPreviewActivity.this, "Неизвестная ошибка на сервере", Toast.LENGTH_LONG).show();
                         }
                     }
-
-                    @Override
-                    public void onFailure(Call<Event> call, Throwable t) {
-                        Log.e("EventPreview", "Сетевая ошибка", t);
-                        Toast.makeText(EventPreviewActivity.this, "Сетевая ошибка: " + t.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
+                }
+                @Override
+                public void onFailure(Call<Event> call, Throwable t) {
+                    Log.e("EventPreview", "Сетевая ошибка", t);
+                    Toast.makeText(EventPreviewActivity.this, "Сетевая ошибка: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
     }
 } 

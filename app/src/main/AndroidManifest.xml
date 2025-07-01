@@ -62,6 +62,7 @@
         <activity android:name=".ui.main.CreateRiddlesActivity" />
         <activity android:name=".ui.main.MapPickerActivity" />
         <activity android:name=".ui.main.EventPreviewActivity" />
+        <activity android:name=".leaderboard.TeamLeaderboardActivity" />
 
     </application>
 

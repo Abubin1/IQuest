@@ -27,6 +27,8 @@ import com.proj.quest.ui.main.TeamAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -152,20 +154,24 @@ public class TeamsActivity extends AppCompatActivity {
     }
 
     private void showInvites(List<InviteResponse> invites) {
-        tvInvites.setText("Приглашения (" + invites.size() + ")");
-        
-        InviteListAdapter adapter = new InviteListAdapter(this, invites, new InviteListAdapter.OnInviteActionListener() {
+        // Фильтрация дубликатов по паре teamId+eventId
+        Map<String, InviteResponse> uniqueInvites = new LinkedHashMap<>();
+        for (InviteResponse invite : invites) {
+            String key = invite.getTeamId() + "_" + invite.getEventId();
+            uniqueInvites.put(key, invite);
+        }
+        List<InviteResponse> filteredInvites = new ArrayList<>(uniqueInvites.values());
+        tvInvites.setText("Приглашения (" + filteredInvites.size() + ")");
+        InviteListAdapter adapter = new InviteListAdapter(this, filteredInvites, new InviteListAdapter.OnInviteActionListener() {
             @Override
             public void onAccept(InviteResponse invite) {
                 acceptInvite(invite.getId());
             }
-            
             @Override
             public void onDecline(InviteResponse invite) {
                 declineInvite(invite.getId());
             }
         });
-        
         listViewInvites.setAdapter(adapter);
     }
 

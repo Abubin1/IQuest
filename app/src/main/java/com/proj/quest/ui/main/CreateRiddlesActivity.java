@@ -42,7 +42,7 @@ public class CreateRiddlesActivity extends AppCompatActivity {
     private ApiService apiService;
     private SharedPrefs sharedPrefs;
 
-    private String eventName, eventDescription, eventDateTime, startPlace;
+    private String eventName, eventDescription, eventDateTime, startPlace; // eventDateTime теперь всегда в UTC
     private int maxMembers, riddleCount, maxTeams;
 
     private EditText currentLatEditText;

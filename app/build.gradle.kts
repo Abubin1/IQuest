@@ -80,6 +80,9 @@ dependencies {
     // AndroidX Preference for osmdroid configuration
     implementation("androidx.preference:preference-ktx:1.2.1")
 
+    // Google Play Services Location для работы с геолокацией
+    implementation("com.google.android.gms:play-services-location:21.2.0")
+
     // Additional dependencies
     implementation("com.google.android.material:material:1.10.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")

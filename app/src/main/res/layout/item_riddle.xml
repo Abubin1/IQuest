@@ -3,9 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="20dp"
     android:layout_marginBottom="8dp"
-    android:background="@drawable/button_background">
+    android:background="@color/white"
+    android:elevation="2dp">
 
     <TextView
         android:id="@+id/riddleNumberTextView"
@@ -22,8 +23,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Текст загадки будет здесь. Он может быть достаточно длинным, чтобы занимать несколько строк."
-        android:textSize="16sp"
-        android:textColor="@android:color/darker_gray"/>
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"/>
 
     <Button
         android:id="@+id/showOnMapButton"

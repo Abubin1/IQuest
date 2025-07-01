@@ -24,7 +24,9 @@ import com.proj.quest.models.Team;
 import com.proj.quest.utils.SharedPrefs;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -160,11 +162,16 @@ public class GroupsFragment extends Fragment {
         if (!isAdded() || getContext() == null) {
             return; // Фрагмент отключен от активности
         }
-        
+        // Фильтрация дубликатов по паре teamId+eventId
+        Map<String, InviteResponse> uniqueInvites = new LinkedHashMap<>();
+        for (InviteResponse invite : invites) {
+            String key = invite.getTeamId() + "_" + invite.getEventId();
+            uniqueInvites.put(key, invite);
+        }
+        List<InviteResponse> filteredInvites = new ArrayList<>(uniqueInvites.values());
         invitesListView.setVisibility(View.VISIBLE);
         noInvitesContainer.setVisibility(View.GONE);
-
-        InviteAdapter adapter = new InviteAdapter(requireContext(), invites, this::acceptInvite, this::declineInvite);
+        InviteAdapter adapter = new InviteAdapter(requireContext(), filteredInvites, this::acceptInvite, this::declineInvite);
         invitesListView.setAdapter(adapter);
     }
 
