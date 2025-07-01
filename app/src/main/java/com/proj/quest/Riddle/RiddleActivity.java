@@ -21,6 +21,8 @@ import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
 import com.proj.quest.leaderboard.LeaderboardActivity;
 import com.proj.quest.models.RiddleRequest;
+import com.proj.quest.models.EventProgress;
+import com.proj.quest.models.TeamRegistrationRequest;
 import com.proj.quest.ui.main.MainActivity;
 import com.proj.quest.ui.main.ProfileActivity;
 import com.proj.quest.utils.SharedPrefs;
@@ -67,12 +69,13 @@ public class RiddleActivity extends AppCompatActivity {
     private int currentRiddleIndex = 0;
     private FusedLocationProviderClient fusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
-    private static final float RIDDLE_RADIUS_METERS = 5.0f;
+    private static final float RIDDLE_RADIUS_METERS = 300.0f;
     private long eventEndMillis = -1;
     private long eventStartMillis = -1;
     private boolean pointsAwarded = false;
     private boolean isCaptain = false;
     private Team myTeam;
+    private boolean isEventFinished = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -84,7 +87,11 @@ public class RiddleActivity extends AppCompatActivity {
         eventId = getIntent().getIntExtra("EVENT_ID", -1);
         eventTime = getIntent().getStringExtra("EVENT_TIME");
         boolean isRegistered = getIntent().getBooleanExtra("IS_REGISTERED", false);
-        Log.d("RiddleActivity", "eventId=" + eventId + ", eventTime=" + eventTime + ", isRegistered=" + isRegistered);
+        isEventFinished = getIntent().getBooleanExtra("EVENT_FINISHED", false);
+        Log.d("RiddleActivity", "eventId=" + eventId + ", eventTime=" + eventTime + ", isRegistered=" + isRegistered + ", isEventFinished=" + isEventFinished);
+        if (isEventFinished) {
+            Log.d("RiddleActivity", "Event is finished, should show registration message");
+        }
         if ((themeUrl == null || themeUrl.isEmpty()) && eventId != -1) {
             // Если themeUrl не передан, загружаем Event с сервера
             ApiService apiService = ApiClient.getApiService();
@@ -122,7 +129,13 @@ public class RiddleActivity extends AppCompatActivity {
         riddlesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         riddlesRecyclerView.setAdapter(riddleAdapter);
 
-        if (!isRegistered || eventTime == null) {
+        if (!isRegistered || eventTime == null || isEventFinished) {
+            // Если не зарегистрирован или мероприятие завершено — показываем сообщение
+            if (isEventFinished) {
+                tvNotRegistered.setText("Сейчас вы не записаны на мероприятия, запишитесь группой.");
+            } else {
+                tvNotRegistered.setText("Для участия в загадках необходимо зарегистрироваться в мероприятии");
+            }
             tvNotRegistered.setVisibility(View.VISIBLE);
             timerTextView.setVisibility(View.GONE);
             riddlesRecyclerView.setVisibility(View.GONE);
@@ -145,6 +158,11 @@ public class RiddleActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // При возврате на экран всегда актуализируем состояние
+        // Если мероприятие завершено или пользователь не зарегистрирован, не запускаем таймер
+        if (isEventFinished || eventId == -1 || eventTime == null) {
+            Log.d("RiddleActivity", "Skipping timer setup: isEventFinished=" + isEventFinished + ", eventId=" + eventId + ", eventTime=" + eventTime);
+            return;
+        }
         parseEventTimes();
         startTimerOrShowRiddles();
         // Если мероприятие завершено — начисляем баллы
@@ -155,6 +173,10 @@ public class RiddleActivity extends AppCompatActivity {
     }
 
     private Date parseEventDate(String dateString) {
+        if (dateString == null) {
+            Log.d("RiddleActivity", "dateString is null, skipping parseEventDate");
+            return null;
+        }
         String[] formats = {
             "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
             "yyyy-MM-dd'T'HH:mm:ss'Z'",
@@ -163,7 +185,7 @@ public class RiddleActivity extends AppCompatActivity {
         for (String format : formats) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
-                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+                sdf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
                 return sdf.parse(dateString);
             } catch (ParseException ignored) {}
         }
@@ -188,31 +210,52 @@ public class RiddleActivity extends AppCompatActivity {
     }
 
     private void startTimerOrShowRiddles() {
+        // Проверяем, не завершено ли мероприятие организатором
+        if (isEventFinished) {
+            timerTextView.setText("Мероприятие завершено организатором");
+            timerTextView.setVisibility(View.VISIBLE);
+            riddlesRecyclerView.setVisibility(View.GONE);
+            singleRiddleLayout.setVisibility(View.GONE);
+            return;
+        }
+        
         long nowMillis = System.currentTimeMillis();
         Log.d("RiddleActivity", "nowMillis=" + nowMillis + ", eventStartMillis=" + eventStartMillis + ", eventEndMillis=" + eventEndMillis);
+        tvNotRegistered.setVisibility(View.GONE); // Скрываем сообщение, если оно было
         if (eventStartMillis == -1 || eventEndMillis == -1) {
             timerTextView.setText("Ошибка времени мероприятия");
+            timerTextView.setVisibility(View.VISIBLE);
+            riddlesRecyclerView.setVisibility(View.GONE);
+            singleRiddleLayout.setVisibility(View.GONE);
             return;
         }
         if (nowMillis < eventStartMillis) {
-            Log.d("RiddleActivity", "Сейчас до начала мероприятия");
+            // До начала мероприятия — только таймер
+            timerTextView.setVisibility(View.VISIBLE);
+            riddlesRecyclerView.setVisibility(View.GONE);
+            singleRiddleLayout.setVisibility(View.GONE);
             long diff = eventStartMillis - nowMillis;
             new CountDownTimer(diff, 1000) {
                 public void onTick(long millisUntilFinished) {
                     long hours = TimeUnit.MILLISECONDS.toHours(millisUntilFinished);
                     long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60;
                     long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60;
-                    timerTextView.setText(String.format(Locale.getDefault(), "До начала: %02d:%02d:%02d", hours, minutes, seconds));
+                    timerTextView.setText(String.format(Locale.getDefault(), "До начала мероприятия: %02d:%02d:%02d", hours, minutes, seconds));
                 }
                 public void onFinish() {
-                    showRiddles();
+                    showCurrentRiddleUI();
                 }
             }.start();
         } else if (nowMillis >= eventStartMillis && nowMillis < eventEndMillis) {
-            showCurrentRiddleUI();
+            // Мероприятие идет — только загадка
+            timerTextView.setVisibility(View.GONE);
+            riddlesRecyclerView.setVisibility(View.GONE);
+            singleRiddleLayout.setVisibility(View.VISIBLE);
+            loadRiddlesAndShowFirst();
         } else {
-            Log.d("RiddleActivity", "Мероприятие завершено");
+            // Мероприятие завершено
             timerTextView.setText("Мероприятие завершено");
+            timerTextView.setVisibility(View.VISIBLE);
             riddlesRecyclerView.setVisibility(View.GONE);
             singleRiddleLayout.setVisibility(View.GONE);
         }
@@ -226,6 +269,13 @@ public class RiddleActivity extends AppCompatActivity {
     }
     
     private void loadRiddles(int eventId) {
+        // Проверяем, не завершено ли мероприятие организатором
+        if (isEventFinished) {
+            Log.d("RiddleActivity", "Event is finished, skipping riddles load");
+            Toast.makeText(RiddleActivity.this, "Мероприятие завершено организатором", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
         ApiService apiService = ApiClient.getApiService();
         String token = new SharedPrefs(this).getToken();
 
@@ -256,6 +306,13 @@ public class RiddleActivity extends AppCompatActivity {
     }
 
     private void loadRiddlesAndShowFirst() {
+        // Проверяем, не завершено ли мероприятие организатором
+        if (isEventFinished) {
+            Log.d("RiddleActivity", "Event is finished, skipping riddles load and show first");
+            Toast.makeText(RiddleActivity.this, "Мероприятие завершено организатором", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
         ApiService apiService = ApiClient.getApiService();
         String token = new SharedPrefs(this).getToken();
         apiService.getEventRiddles("Bearer " + token, eventId).enqueue(new Callback<List<RiddleRequest>>() {
@@ -282,6 +339,14 @@ public class RiddleActivity extends AppCompatActivity {
             tvRiddleNumber.setText("Все загадки решены!");
             tvQuestion.setText("");
             checkBtn.setVisibility(View.GONE);
+            
+            // Показываем кнопку завершения мероприятия для капитана
+            if (isCaptain) {
+                checkBtn.setVisibility(View.VISIBLE);
+                checkBtn.setEnabled(true);
+                checkBtn.setText("Завершить мероприятие");
+                checkBtn.setOnClickListener(v -> completeEvent());
+            }
             return;
         }
         RiddleRequest riddle = riddleList.get(currentRiddleIndex);
@@ -303,6 +368,14 @@ public class RiddleActivity extends AppCompatActivity {
     }
 
     private void checkLocationForRiddle(RiddleRequest riddle) {
+        // Проверяем, не завершено ли мероприятие организатором
+        if (isEventFinished) {
+            tvResult.setText("Мероприятие завершено организатором. Проверка загадок недоступна.");
+            tvResult.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            tvResult.setVisibility(View.VISIBLE);
+            return;
+        }
+        
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
             tvResult.setText("Требуется разрешение на геолокацию");
@@ -435,6 +508,38 @@ public class RiddleActivity extends AppCompatActivity {
                 isCaptain = false;
                 parseEventTimes();
                 startTimerOrShowRiddles();
+            }
+        });
+    }
+
+    private void completeEvent() {
+        if (myTeam == null || !isCaptain) {
+            Toast.makeText(this, "Только капитан команды может завершить мероприятие", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ApiService apiService = ApiClient.getApiService();
+        String token = new SharedPrefs(this).getToken();
+        
+        TeamRegistrationRequest request = new TeamRegistrationRequest();
+        request.setTeamId(myTeam.getId());
+        request.setEventId(eventId);
+        request.setSelectedMemberIds(new ArrayList<>()); // Пустой список, так как не используется в этом эндпоинте
+
+        apiService.completeEvent("Bearer " + token, request).enqueue(new retrofit2.Callback<Void>() {
+            @Override
+            public void onResponse(retrofit2.Call<Void> call, retrofit2.Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(RiddleActivity.this, "Мероприятие успешно завершено! Время зафиксировано.", Toast.LENGTH_LONG).show();
+                    // Можно добавить обновление UI
+                } else {
+                    Toast.makeText(RiddleActivity.this, "Ошибка завершения мероприятия", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<Void> call, Throwable t) {
+                Toast.makeText(RiddleActivity.this, "Ошибка сети: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -49,20 +49,29 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private Context context;
     private SharedPrefs sharedPrefs;
 
-    public void setEvents(List<Event> allEvents, Event nearestUserEvent, List<Event> otherEvents, List<Event> finishedEvents) {
+    public void setEvents(Event currentEvent, Event nextEvent, List<Event> registeredFuture, List<Event> otherFuture, List<Event> finishedEvents) {
         items.clear();
-        if (nearestUserEvent != null) {
-            items.add(new SectionedItem(VIEW_TYPE_SECTION_HEADER, "Ближайшее с группой", null));
-            items.add(new SectionedItem(VIEW_TYPE_EVENT_ITEM, null, nearestUserEvent));
+        if (currentEvent != null) {
+            items.add(new SectionedItem(VIEW_TYPE_SECTION_HEADER, "Текущее мероприятие", null));
+            items.add(new SectionedItem(VIEW_TYPE_EVENT_ITEM, null, currentEvent));
+        } else if (nextEvent != null) {
+            items.add(new SectionedItem(VIEW_TYPE_SECTION_HEADER, "Ближайшее мероприятие", null));
+            items.add(new SectionedItem(VIEW_TYPE_EVENT_ITEM, null, nextEvent));
         }
-        if (!otherEvents.isEmpty()) {
-            items.add(new SectionedItem(VIEW_TYPE_SECTION_HEADER, "Остальные мероприятия", null));
-            for (Event e : otherEvents) {
+        if (!registeredFuture.isEmpty()) {
+            items.add(new SectionedItem(VIEW_TYPE_SECTION_HEADER, "Зарегистрированные мероприятия", null));
+            for (Event e : registeredFuture) {
+                items.add(new SectionedItem(VIEW_TYPE_EVENT_ITEM, null, e));
+            }
+        }
+        if (!otherFuture.isEmpty()) {
+            items.add(new SectionedItem(VIEW_TYPE_SECTION_HEADER, "Другие мероприятия", null));
+            for (Event e : otherFuture) {
                 items.add(new SectionedItem(VIEW_TYPE_EVENT_ITEM, null, e));
             }
         }
         if (!finishedEvents.isEmpty()) {
-            items.add(new SectionedItem(VIEW_TYPE_SECTION_HEADER, "Завершенные мероприятия", null));
+            items.add(new SectionedItem(VIEW_TYPE_SECTION_HEADER, "Завершённые мероприятия", null));
             for (Event e : finishedEvents) {
                 items.add(new SectionedItem(VIEW_TYPE_EVENT_ITEM, null, e));
             }
@@ -112,7 +121,11 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             } else {
                 eventHolder.tvEventDate.setText("Дата: неверный формат");
             }
-            eventHolder.tvTeamCount.setText("Зарегистрированные команды: " + event.getTeamCount());
+            if (event.getMaxTeamLimit() > 0) {
+                eventHolder.tvTeamCount.setText("Зарегистрировано: " + event.getCurrentTeamCount() + " / " + event.getMaxTeamLimit() + " команд");
+            } else {
+                eventHolder.tvTeamCount.setText("Зарегистрировано: " + event.getCurrentTeamCount() + " команд");
+            }
             eventHolder.tvMaxMembers.setText("Макс. участников: " + event.getMaxTeamMembers());
             if (isNearestUserEvent) {
                 eventHolder.cardView.setCardBackgroundColor(Color.parseColor("#E3F2FD"));

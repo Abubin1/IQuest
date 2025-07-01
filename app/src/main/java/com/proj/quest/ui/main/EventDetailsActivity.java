@@ -42,6 +42,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     private ApiService apiService;
     private SharedPrefs sharedPrefs;
     private Button btnRegister;
+    private Button btnUnregister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,16 +64,19 @@ public class EventDetailsActivity extends AppCompatActivity {
         loadEventDetails();
         loadRegisteredTeams();
 
-        // --- ДОБАВЛЕНО: Проверка завершённости мероприятия и регистрации команды ---
-        checkRegistrationAndEventStatus();
-        // --- КОНЕЦ ДОБАВЛЕНИЯ ---
-
         Button btnTeamLeaderboard = findViewById(R.id.btnTeamLeaderboard);
         btnTeamLeaderboard.setOnClickListener(v -> {
             Intent intent = new Intent(this, com.proj.quest.leaderboard.TeamLeaderboardActivity.class);
             intent.putExtra("eventId", event.getId());
             startActivity(intent);
         });
+
+        btnUnregister = findViewById(R.id.btnUnregister);
+        btnUnregister.setOnClickListener(v -> attemptUnregister());
+
+        // --- ДОБАВЛЕНО: Проверка завершённости мероприятия и регистрации команды ---
+        checkRegistrationAndEventStatus();
+        // --- КОНЕЦ ДОБАВЛЕНИЯ ---
     }
 
     private void setupViews() {
@@ -102,7 +106,11 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         tvStartTime.setText(event.getStartTime() != null ? event.getStartTime() : "Не указано");
         tvStartLocation.setText(event.getStartLocation() != null ? event.getStartLocation() : "Не указано");
-        tvTeamCount.setText("Максимальное количество команд: " + event.getTeamCount());
+        if (event.getMaxTeamLimit() > 0) {
+            tvTeamCount.setText("Зарегистрировано: " + event.getCurrentTeamCount() + " / " + event.getMaxTeamLimit() + " команд");
+        } else {
+            tvTeamCount.setText("Зарегистрировано: " + event.getCurrentTeamCount() + " команд");
+        }
         tvMaxMembers.setText(String.valueOf(event.getMaxTeamMembers()));
         tvRiddleCount.setText(String.valueOf(event.getRiddleCount()));
         tvDescription.setText(event.getDescription() != null ? event.getDescription() : "Описание отсутствует");
@@ -114,7 +122,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         if (date == null || time == null) return null;
         String dateTime = date + "T" + time + ".000Z";
         SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        parser.setTimeZone(TimeZone.getTimeZone("UTC"));
+        parser.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
         try {
             return parser.parse(dateTime);
         } catch (ParseException e) {
@@ -152,7 +160,11 @@ public class EventDetailsActivity extends AppCompatActivity {
                     }
 
                     TextView tvTeamCount = findViewById(R.id.tvTeamCount);
-                    tvTeamCount.setText("Количество команд: " + registeredCount + " / " + event.getTeamCount());
+                    if (event.getMaxTeamLimit() > 0) {
+                        tvTeamCount.setText("Зарегистрировано: " + registeredCount + " / " + event.getMaxTeamLimit() + " команд");
+                    } else {
+                        tvTeamCount.setText("Зарегистрировано: " + registeredCount + " команд");
+                    }
                 }
             }
 
@@ -164,6 +176,12 @@ public class EventDetailsActivity extends AppCompatActivity {
     }
 
     private void checkTeamAndRegister() {
+        // Проверяем, не завершено ли мероприятие
+        if (event.getFinished() != null && event.getFinished()) {
+            Toast.makeText(this, "Нельзя зарегистрироваться на завершённое мероприятие", Toast.LENGTH_LONG).show();
+            return;
+        }
+        
         String token = sharedPrefs.getToken();
         if (token == null || token.isEmpty()) {
             Toast.makeText(this, getString(R.string.need_login), Toast.LENGTH_SHORT).show();
@@ -222,7 +240,6 @@ public class EventDetailsActivity extends AppCompatActivity {
             .setMessage(getString(R.string.create_team_dialog_message))
             .setPositiveButton(getString(R.string.create_team_button), (dialog, which) -> {
                 Intent intent = new Intent(this, CreateGroupActivity.class);
-                intent.putExtra("eventId", event.getId());
                 startActivity(intent);
             })
             .setNegativeButton(getString(R.string.cancel_button), null)
@@ -362,44 +379,84 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     // --- ДОБАВЛЕНО: Метод проверки регистрации и завершённости мероприятия ---
     private void checkRegistrationAndEventStatus() {
-        // Проверка завершённости мероприятия
-        Date eventDate = parseStartDateTime(event.getStartDate(), event.getStartTime());
-        boolean isEventFinished = false;
-        if (eventDate != null) {
-            long eventStart = eventDate.getTime();
-            long eventEnd = eventStart + 3 * 60 * 60 * 1000; // +3 часа
-            Date now = new Date();
-            if (now.getTime() > eventEnd) {
-                isEventFinished = true;
-            }
-        }
-        if (isEventFinished) {
-            btnRegister.setEnabled(false);
-            btnRegister.setText(getString(R.string.event_finished));
+        // Проверяем, не завершено ли мероприятие
+        if (event.getFinished() != null && event.getFinished()) {
+            btnRegister.setVisibility(View.GONE);
+            btnUnregister.setVisibility(View.GONE);
             return;
         }
-        // Проверка, зарегистрирована ли команда на это мероприятие
+        
+        String token = sharedPrefs.getToken();
+        if (token == null || token.isEmpty()) return;
+        apiService.getMyTeam("Bearer " + token).enqueue(new Callback<Team>() {
+            @Override
+            public void onResponse(Call<Team> call, Response<Team> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Team team = response.body();
+                    boolean isCaptain = team.getCaptainId() == sharedPrefs.getUserId();
+                    boolean isRegistered = team.getEventId() != null && team.getEventId().equals(event.getId());
+                    if (isCaptain && isRegistered) {
+                        btnUnregister.setVisibility(View.VISIBLE);
+                        btnRegister.setVisibility(View.GONE);
+                    } else {
+                        btnUnregister.setVisibility(View.GONE);
+                        btnRegister.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    btnUnregister.setVisibility(View.GONE);
+                    btnRegister.setVisibility(View.VISIBLE);
+                }
+            }
+            @Override
+            public void onFailure(Call<Team> call, Throwable t) {
+                btnUnregister.setVisibility(View.GONE);
+                btnRegister.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void attemptUnregister() {
+        // Проверяем, не завершено ли мероприятие
+        if (event.getFinished() != null && event.getFinished()) {
+            Toast.makeText(this, "Нельзя отменить регистрацию на завершённое мероприятие", Toast.LENGTH_LONG).show();
+            return;
+        }
+        
         String token = sharedPrefs.getToken();
         if (token == null || token.isEmpty()) {
+            Toast.makeText(this, getString(R.string.need_login), Toast.LENGTH_SHORT).show();
             return;
         }
         apiService.getMyTeam("Bearer " + token).enqueue(new Callback<Team>() {
             @Override
             public void onResponse(Call<Team> call, Response<Team> response) {
-                if (isFinishing() || isDestroyed()) {
-                    return;
-                }
                 if (response.isSuccessful() && response.body() != null) {
                     Team team = response.body();
-                    if (team.getEventId() != null && team.getEventId().equals(event.getId())) {
-                        btnRegister.setEnabled(false);
-                        btnRegister.setText(getString(R.string.registered_button_text));
-                    }
+                    TeamRegistrationRequest request = new TeamRegistrationRequest(team.getId(), event.getId());
+                    apiService.unregisterTeamForEvent("Bearer " + token, request).enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(EventDetailsActivity.this, "Регистрация отменена", Toast.LENGTH_SHORT).show();
+                                btnUnregister.setVisibility(View.GONE);
+                                btnRegister.setVisibility(View.VISIBLE);
+                                loadRegisteredTeams();
+                            } else {
+                                Toast.makeText(EventDetailsActivity.this, "Ошибка отмены регистрации", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            Toast.makeText(EventDetailsActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(EventDetailsActivity.this, "Ошибка получения команды", Toast.LENGTH_SHORT).show();
                 }
             }
             @Override
             public void onFailure(Call<Team> call, Throwable t) {
-                // ничего не делаем
+                Toast.makeText(EventDetailsActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -172,47 +172,74 @@ public class EventsFragment extends Fragment {
     }
 
     private void filterAndDisplayEvents() {
-        List<Event> futureEvents = new ArrayList<>();
-        List<Event> finishedEvents = new ArrayList<>();
         Date now = new Date();
-        Event nearestUserEvent = null;
+        Event currentEvent = null;
+        Event nextEvent = null;
+        List<Event> registeredFuture = new ArrayList<>();
+        List<Event> otherFuture = new ArrayList<>();
+        List<Event> finishedEvents = new ArrayList<>();
+        // Список id мероприятий, на которые пользователь зарегистрирован
+        List<Integer> registeredEventIds = new ArrayList<>();
+        for (Team team : userTeams) {
+            if (team.getEventId() != null) {
+                registeredEventIds.add(team.getEventId());
+            }
+        }
+        // 1. Сначала разделим завершённые и будущие
+        List<Event> futureEvents = new ArrayList<>();
         for (Event event : allEvents) {
             Date eventDate = parseStartDateTime(event.getStartDate(), event.getStartTime());
             if (eventDate == null) continue;
-            boolean isRegistered = false;
-            for (Team team : userTeams) {
-                if (team.getEventId() != null && team.getEventId().intValue() == event.getId()) {
-                    isRegistered = true;
-                    break;
-                }
-            }
             long eventStart = eventDate.getTime();
-            long eventEnd = eventStart + 3 * 60 * 60 * 1000; // +3 часа
-            if (now.getTime() > eventEnd) {
+            long eventEnd = eventStart + 3 * 60 * 60 * 1000;
+            boolean isFinished = (event.getFinished() != null && event.getFinished()) || now.getTime() > eventEnd;
+            if (isFinished) {
                 finishedEvents.add(event);
-                continue;
-            }
-            // Если мероприятие идет сейчас — оно текущее и не попадает в futureEvents
-            if (isRegistered && now.getTime() >= eventStart && now.getTime() < eventEnd) {
-                nearestUserEvent = event;
-                continue;
-            }
-            if (eventDate.after(now)) {
+            } else {
                 futureEvents.add(event);
-                if (isRegistered && nearestUserEvent == null) {
-                    nearestUserEvent = event;
+            }
+        }
+        // 2. Среди будущих ищем текущее и ближайшее для зарегистрированных
+        for (Event event : futureEvents) {
+            Date eventDate = parseStartDateTime(event.getStartDate(), event.getStartTime());
+            if (eventDate == null) continue;
+            long eventStart = eventDate.getTime();
+            long eventEnd = eventStart + 3 * 60 * 60 * 1000;
+            boolean isRegistered = registeredEventIds.contains(event.getId());
+            if (isRegistered) {
+                if (now.getTime() >= eventStart && now.getTime() < eventEnd) {
+                    currentEvent = event;
+                } else if (eventStart > now.getTime()) {
+                    if (nextEvent == null || eventStart < parseStartDateTime(nextEvent.getStartDate(), nextEvent.getStartTime()).getTime()) {
+                        nextEvent = event;
+                    }
                 }
             }
         }
-        Collections.sort(futureEvents, (e1, e2) -> {
+        // 3. Зарегистрированные будущие (кроме текущего и ближайшего)
+        for (Event event : futureEvents) {
+            if (!registeredEventIds.contains(event.getId())) continue;
+            if ((currentEvent != null && event.getId() == currentEvent.getId()) || (nextEvent != null && event.getId() == nextEvent.getId())) continue;
+            registeredFuture.add(event);
+        }
+        // 4. Другие будущие (не зарегистрированные)
+        for (Event event : futureEvents) {
+            if (!registeredEventIds.contains(event.getId())) {
+                otherFuture.add(event);
+            }
+        }
+        // 5. Сортировка
+        Comparator<Event> byDate = (e1, e2) -> {
             Date d1 = parseStartDateTime(e1.getStartDate(), e1.getStartTime());
             Date d2 = parseStartDateTime(e2.getStartDate(), e2.getStartTime());
             if (d1 == null && d2 == null) return 0;
             if (d1 == null) return 1;
             if (d2 == null) return -1;
             return d1.compareTo(d2);
-        });
-        Collections.sort(finishedEvents, (e1, e2) -> {
+        };
+        registeredFuture.sort(byDate);
+        otherFuture.sort(byDate);
+        finishedEvents.sort((e1, e2) -> {
             Date d1 = parseStartDateTime(e1.getStartDate(), e1.getStartTime());
             Date d2 = parseStartDateTime(e2.getStartDate(), e2.getStartTime());
             if (d1 == null && d2 == null) return 0;
@@ -220,12 +247,8 @@ public class EventsFragment extends Fragment {
             if (d2 == null) return -1;
             return d2.compareTo(d1); // завершённые — новые сверху
         });
-        // Формируем список остальных мероприятий (без ближайшего)
-        List<Event> otherEvents = new ArrayList<>(futureEvents);
-        if (nearestUserEvent != null) {
-            otherEvents.remove(nearestUserEvent);
-        }
-        adapter.setEvents(futureEvents, nearestUserEvent, otherEvents, finishedEvents);
+        // 6. Передаём в адаптер
+        adapter.setEvents(currentEvent, nextEvent, registeredFuture, otherFuture, finishedEvents);
         adapter.setUserTeams(userTeams);
     }
 
@@ -233,7 +256,7 @@ public class EventsFragment extends Fragment {
         if (date == null || time == null) return null;
         String dateTime = date + "T" + time + ".000Z";
         SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        parser.setTimeZone(TimeZone.getTimeZone("UTC"));
+        parser.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
         try {
             return parser.parse(dateTime);
         } catch (ParseException e) {

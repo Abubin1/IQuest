@@ -68,7 +68,7 @@
         android:id="@+id/awardPointsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Начислить баллы"
+        android:text="Завершить мероприятие и начислить баллы"
         android:layout_margin="16dp"
-        android:layout_gravity="bottom" />
+        android:layout_alignParentBottom="true" />
 </RelativeLayout> 

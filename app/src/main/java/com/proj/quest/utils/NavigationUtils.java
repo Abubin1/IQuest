@@ -33,9 +33,7 @@ public class NavigationUtils {
                 if (response.isSuccessful() && response.body() != null) {
                     Team team = response.body();
                     if (team.getId() <= 0) {
-                        Intent intent = new Intent(activity, RiddleActivity.class);
-                        intent.putExtra("IS_REGISTERED", false);
-                        activity.startActivity(intent);
+                        Toast.makeText(activity, "Сейчас вы не записаны на мероприятия, запишитесь группой", Toast.LENGTH_LONG).show();
                         return;
                     }
                     // Получаем все мероприятия для команды
@@ -45,18 +43,20 @@ public class NavigationUtils {
                             if (response.isSuccessful() && response.body() != null) {
                                 java.util.List<Event> registeredEvents = response.body();
                                 if (registeredEvents.isEmpty()) {
-                                    Intent intent = new Intent(activity, RiddleActivity.class);
-                                    intent.putExtra("IS_REGISTERED", false);
-                                    activity.startActivity(intent);
+                                    Toast.makeText(activity, "Сейчас вы не записаны на мероприятия, запишитесь группой", Toast.LENGTH_LONG).show();
                                     return;
                                 }
-                                // Ищем ближайшее (сейчас идет или ближайшее будущее)
+                                // Ищем ближайшее (сейчас идет или ближайшее будущее), исключая завершенные
                                 Event bestEvent = null;
                                 long now = System.currentTimeMillis();
                                 long minDiff = Long.MAX_VALUE;
                                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
-                                sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+                                sdf.setTimeZone(java.util.TimeZone.getTimeZone("Europe/Moscow"));
                                 for (Event event : registeredEvents) {
+                                    // Пропускаем завершенные мероприятия
+                                    if (event.getFinished() != null && event.getFinished()) {
+                                        continue;
+                                    }
                                     String eventDateTime = event.getStartDate() + "T" + event.getStartTime() + ".000Z";
                                     try {
                                         java.util.Date eventDate = sdf.parse(eventDateTime);
@@ -81,14 +81,14 @@ public class NavigationUtils {
                                     intent.putExtra("EVENT_ID", bestEvent.getId());
                                     intent.putExtra("EVENT_TIME", eventDateTime);
                                     intent.putExtra("IS_REGISTERED", true);
+                                    intent.putExtra("EVENT_FINISHED", bestEvent.getFinished() != null ? bestEvent.getFinished() : false);
                                     if (bestEvent.getThemeUrl() != null) {
                                         intent.putExtra("EVENT_THEME_URL", bestEvent.getThemeUrl());
                                     }
                                     activity.startActivity(intent);
                                 } else {
-                                    Intent intent = new Intent(activity, RiddleActivity.class);
-                                    intent.putExtra("IS_REGISTERED", false);
-                                    activity.startActivity(intent);
+                                    // Если нет активных мероприятий, показываем сообщение в текущей активности
+                                    Toast.makeText(activity, "Сейчас вы не записаны на мероприятия, запишитесь группой", Toast.LENGTH_LONG).show();
                                 }
                             } else {
                                 activity.runOnUiThread(() -> Toast.makeText(activity, "Ошибка загрузки мероприятий", Toast.LENGTH_SHORT).show());
@@ -100,9 +100,7 @@ public class NavigationUtils {
                         }
                     });
                 } else {
-                    Intent intent = new Intent(activity, RiddleActivity.class);
-                    intent.putExtra("IS_REGISTERED", false);
-                    activity.startActivity(intent);
+                    Toast.makeText(activity, "Сейчас вы не записаны на мероприятия, запишитесь группой", Toast.LENGTH_LONG).show();
                 }
             }
             @Override

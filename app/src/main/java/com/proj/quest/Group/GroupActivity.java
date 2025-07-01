@@ -181,7 +181,7 @@ public class GroupActivity extends AppCompatActivity {
                 try {
                     String dateTime = event.getStartDate() + "T" + event.getStartTime() + ".000Z";
                     java.text.SimpleDateFormat parser = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
-                    parser.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+                    parser.setTimeZone(java.util.TimeZone.getTimeZone("Europe/Moscow"));
                     java.util.Date eventStart = parser.parse(dateTime);
                     // Предположим, что мероприятие длится 2 часа (или добавить поле endTime, если есть)
                     long eventDuration = 2 * 60 * 60 * 1000L;

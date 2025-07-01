@@ -87,6 +87,7 @@ public class CreateEventActivity extends AppCompatActivity {
     private void updateTimeLabel() {
         String format = "HH:mm";
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(format, Locale.getDefault());
+        sdf.setTimeZone(java.util.TimeZone.getTimeZone("Europe/Moscow"));
         tvSelectedTime.setText(sdf.format(selectedDate.getTime()));
     }
 
@@ -127,7 +128,7 @@ public class CreateEventActivity extends AppCompatActivity {
         }
         
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+        sdf.setTimeZone(java.util.TimeZone.getTimeZone("Europe/Moscow"));
         String formattedDateTime = sdf.format(selectedDate.getTime());
 
         // Переход на CreateRiddlesActivity

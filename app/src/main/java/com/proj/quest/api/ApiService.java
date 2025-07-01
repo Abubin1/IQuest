@@ -16,6 +16,7 @@ import com.proj.quest.models.KickRequest;
 import com.proj.quest.models.CreateEventRequest;
 import com.proj.quest.models.RiddleRequest;
 import com.proj.quest.models.ThemeUploadResponse;
+import com.proj.quest.models.EventProgress;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -76,6 +77,12 @@ public interface ApiService {
 
     @POST("api/teams/register")
     Call<TeamRegistrationResponse> registerTeamForEvent(
+        @Header("Authorization") String token,
+        @Body TeamRegistrationRequest request
+    );
+
+    @POST("api/teams/unregister")
+    Call<Void> unregisterTeamForEvent(
         @Header("Authorization") String token,
         @Body TeamRegistrationRequest request
     );
@@ -163,4 +170,10 @@ public interface ApiService {
 
     @POST("api/events/{eventId}/award-points")
     Call<Void> awardPointsForEvent(@Header("Authorization") String token, @Path("eventId") int eventId);
+
+    @POST("api/teams/complete-event")
+    Call<Void> completeEvent(@Header("Authorization") String token, @Body TeamRegistrationRequest request);
+
+    @GET("api/teams/{teamId}/event-progress/{eventId}")
+    Call<EventProgress> getEventProgress(@Header("Authorization") String token, @Path("teamId") int teamId, @Path("eventId") int eventId);
 }

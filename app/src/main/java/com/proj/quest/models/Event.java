@@ -14,8 +14,10 @@ public class Event implements Serializable {
     private String startTime;
     @SerializedName("МестоСтарта")
     private String startLocation;
+    @SerializedName("МаксимальноеКоличествоКоманд")
+    private int maxTeamLimit;
     @SerializedName("КоличествоКоманд")
-    private int teamCount;
+    private int currentTeamCount;
     @SerializedName("МаксимальноеКоличествоЧеловекВК")
     private int maxTeamMembers;
     @SerializedName("КоличествоЗагадок")
@@ -26,6 +28,8 @@ public class Event implements Serializable {
     private String description;
     @SerializedName("theme_url")
     private String themeUrl;
+    @SerializedName("Завершено")
+    private Boolean finished;
 
     public Event() {}
 
@@ -35,12 +39,14 @@ public class Event implements Serializable {
     public String getStartDate() { return startDate; }
     public String getStartTime() { return startTime; }
     public String getStartLocation() { return startLocation; }
-    public int getTeamCount() { return teamCount; }
+    public int getMaxTeamLimit() { return maxTeamLimit; }
+    public int getCurrentTeamCount() { return currentTeamCount; }
     public int getMaxTeamMembers() { return maxTeamMembers; }
     public int getRiddleCount() { return riddleCount; }
     public String getOrganizer() { return organizer; }
     public String getDescription() { return description; }
     public String getThemeUrl() { return themeUrl; }
+    public Boolean getFinished() { return finished; }
 
     // Сеттеры
     public void setId(int id) { this.id = id; }
@@ -48,10 +54,12 @@ public class Event implements Serializable {
     public void setStartDate(String startDate) { this.startDate = startDate; }
     public void setStartTime(String startTime) { this.startTime = startTime; }
     public void setStartLocation(String startLocation) { this.startLocation = startLocation; }
-    public void setTeamCount(int teamCount) { this.teamCount = teamCount; }
+    public void setMaxTeamLimit(int maxTeamLimit) { this.maxTeamLimit = maxTeamLimit; }
+    public void setCurrentTeamCount(int currentTeamCount) { this.currentTeamCount = currentTeamCount; }
     public void setMaxTeamMembers(int maxTeamMembers) { this.maxTeamMembers = maxTeamMembers; }
     public void setRiddleCount(int riddleCount) { this.riddleCount = riddleCount; }
     public void setOrganizer(String organizer) { this.organizer = organizer; }
     public void setDescription(String description) { this.description = description; }
     public void setThemeUrl(String themeUrl) { this.themeUrl = themeUrl; }
+    public void setFinished(Boolean finished) { this.finished = finished; }
 }
