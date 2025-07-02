@@ -174,6 +174,26 @@ public interface ApiService {
     @POST("api/teams/complete-event")
     Call<Void> completeEvent(@Header("Authorization") String token, @Body TeamRegistrationRequest request);
 
-    @GET("api/teams/{teamId}/event-progress/{eventId}")
-    Call<EventProgress> getEventProgress(@Header("Authorization") String token, @Path("teamId") int teamId, @Path("eventId") int eventId);
+    @GET("api/teams/{teamId}/event/{eventId}/riddle-progress")
+    Call<okhttp3.ResponseBody> getTeamRiddleProgress(
+        @Header("Authorization") String token,
+        @Path("teamId") int teamId,
+        @Path("eventId") int eventId
+    );
+
+    @POST("api/teams/{teamId}/event/{eventId}/riddle-progress")
+    Call<Void> setTeamRiddleProgress(
+        @Header("Authorization") String token,
+        @Path("teamId") int teamId,
+        @Path("eventId") int eventId,
+        @Body okhttp3.RequestBody body
+    );
+
+    @POST("api/teams/{teamId}/event/{eventId}/finish")
+    Call<Void> setTeamFinishTime(
+        @Header("Authorization") String token,
+        @Path("teamId") int teamId,
+        @Path("eventId") int eventId,
+        @Query("finishTime") long finishTime
+    );
 }

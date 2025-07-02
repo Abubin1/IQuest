@@ -51,4 +51,33 @@ public class SharedPrefs {
     public void clear() {
         prefs.edit().clear().apply();
     }
+
+    // Универсальные методы для int
+    public void putInt(String key, int value) {
+        prefs.edit().putInt(key, value).apply();
+    }
+    public int getInt(String key, int defValue) {
+        return prefs.getInt(key, defValue);
+    }
+
+    // Универсальные методы для long
+    public void putLong(String key, long value) {
+        prefs.edit().putLong(key, value).apply();
+    }
+    public long getLong(String key, long defValue) {
+        return prefs.getLong(key, defValue);
+    }
+
+    // Удаление по ключу
+    public void remove(String key) {
+        prefs.edit().remove(key).apply();
+    }
+
+    // Универсальные методы для boolean
+    public void putBoolean(String key, boolean value) {
+        prefs.edit().putBoolean(key, value).apply();
+    }
+    public boolean getBoolean(String key, boolean defValue) {
+        return prefs.getBoolean(key, defValue);
+    }
 }

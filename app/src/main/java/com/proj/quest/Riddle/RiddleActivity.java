@@ -52,6 +52,8 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import android.location.Location;
 import com.proj.quest.models.Team;
+import org.json.JSONObject;
+import okhttp3.RequestBody;
 
 public class RiddleActivity extends AppCompatActivity {
 
@@ -76,6 +78,9 @@ public class RiddleActivity extends AppCompatActivity {
     private boolean isCaptain = false;
     private Team myTeam;
     private boolean isEventFinished = false;
+    private SharedPrefs prefs;
+    private String riddleProgressKey;
+    private String riddleStartTimeKey;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -152,6 +157,16 @@ public class RiddleActivity extends AppCompatActivity {
         setupBottomNavigation();
         loadMyTeamAndContinue();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        prefs = new SharedPrefs(this);
+        riddleProgressKey = "riddle_progress_" + eventId + "_" + prefs.getUserId();
+        riddleStartTimeKey = "riddle_start_time_" + eventId + "_" + prefs.getUserId();
+        boolean isRiddleFinished = prefs.getBoolean("riddle_finished_" + eventId + "_" + prefs.getUserId(), false);
+        if (isRiddleFinished) {
+            showCompletionScreen();
+            return;
+        }
+        currentRiddleIndex = prefs.getInt(riddleProgressKey, 0);
     }
 
     @Override
@@ -306,13 +321,11 @@ public class RiddleActivity extends AppCompatActivity {
     }
 
     private void loadRiddlesAndShowFirst() {
-        // Проверяем, не завершено ли мероприятие организатором
         if (isEventFinished) {
             Log.d("RiddleActivity", "Event is finished, skipping riddles load and show first");
             Toast.makeText(RiddleActivity.this, "Мероприятие завершено организатором", Toast.LENGTH_SHORT).show();
             return;
         }
-        
         ApiService apiService = ApiClient.getApiService();
         String token = new SharedPrefs(this).getToken();
         apiService.getEventRiddles("Bearer " + token, eventId).enqueue(new Callback<List<RiddleRequest>>() {
@@ -321,7 +334,6 @@ public class RiddleActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     riddleList.clear();
                     riddleList.addAll(response.body());
-                    currentRiddleIndex = 0;
                     showCurrentRiddle();
                 } else {
                     Toast.makeText(RiddleActivity.this, "Failed to load riddles", Toast.LENGTH_SHORT).show();
@@ -394,7 +406,15 @@ public class RiddleActivity extends AppCompatActivity {
                     tvResult.setText("Верно! Вы находитесь в нужной точке.");
                     tvResult.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
                     tvResult.setVisibility(View.VISIBLE);
-                    // НЕ переходим к следующей загадке, пользователь остается на этой
+                    // Переход к следующей загадке через 1 секунду
+                    checkBtn.postDelayed(() -> {
+                        currentRiddleIndex++;
+                        if (currentRiddleIndex < riddleList.size()) {
+                            showCurrentRiddle();
+                        } else {
+                            showCurrentRiddle(); // Показываем экран завершения (id 2)
+                        }
+                    }, 1000);
                 } else {
                     tvResult.setText(String.format("Неверно! Вы находитесь %.1f м от точки.", results[0]));
                     tvResult.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
@@ -499,17 +519,62 @@ public class RiddleActivity extends AppCompatActivity {
                 } else {
                     isCaptain = false;
                 }
-                // После загрузки команды продолжаем обычный flow
+                // После загрузки команды получаем прогресс загадки с сервера
                 parseEventTimes();
-                startTimerOrShowRiddles();
+                fetchTeamRiddleProgressAndShow();
             }
             @Override
             public void onFailure(retrofit2.Call<com.proj.quest.models.Team> call, Throwable t) {
                 isCaptain = false;
                 parseEventTimes();
-                startTimerOrShowRiddles();
+                fetchTeamRiddleProgressAndShow();
             }
         });
+    }
+
+    private void fetchTeamRiddleProgressAndShow() {
+        if (myTeam == null) return;
+        ApiService apiService = ApiClient.getApiService();
+        String token = new SharedPrefs(this).getToken();
+        apiService.getTeamRiddleProgress("Bearer " + token, myTeam.getId(), eventId)
+            .enqueue(new retrofit2.Callback<okhttp3.ResponseBody>() {
+                @Override
+                public void onResponse(retrofit2.Call<okhttp3.ResponseBody> call, retrofit2.Response<okhttp3.ResponseBody> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        try {
+                            String json = response.body().string();
+                            JSONObject obj = new JSONObject(json);
+                            currentRiddleIndex = obj.optInt("currentRiddle", 0);
+                        } catch (Exception e) {
+                            currentRiddleIndex = 0;
+                        }
+                    } else {
+                        currentRiddleIndex = 0;
+                    }
+                    showCurrentRiddle();
+                }
+                @Override
+                public void onFailure(retrofit2.Call<okhttp3.ResponseBody> call, Throwable t) {
+                    currentRiddleIndex = 0;
+                    showCurrentRiddle();
+                }
+            });
+    }
+
+    private void updateTeamRiddleProgressOnServer(int riddleIndex) {
+        if (myTeam == null) return;
+        ApiService apiService = ApiClient.getApiService();
+        String token = new SharedPrefs(this).getToken();
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("currentRiddle", riddleIndex);
+        } catch (Exception ignored) {}
+        RequestBody body = RequestBody.create(obj.toString(), okhttp3.MediaType.parse("application/json"));
+        apiService.setTeamRiddleProgress("Bearer " + token, myTeam.getId(), eventId, body)
+            .enqueue(new retrofit2.Callback<Void>() {
+                @Override public void onResponse(retrofit2.Call<Void> call, retrofit2.Response<Void> response) {}
+                @Override public void onFailure(retrofit2.Call<Void> call, Throwable t) {}
+            });
     }
 
     private void completeEvent() {
@@ -542,5 +607,57 @@ public class RiddleActivity extends AppCompatActivity {
                 Toast.makeText(RiddleActivity.this, "Ошибка сети: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
+        long startTime = prefs.getLong(riddleStartTimeKey, 0);
+        long finishTime = System.currentTimeMillis();
+        long duration = finishTime - startTime;
+        if (startTime > 0) {
+            String timeStr = String.format("Вы прошли все загадки за %d мин %d сек", duration/60000, (duration/1000)%60);
+            tvResult.setText(timeStr);
+            // Отправить время на сервер
+            sendFinishTimeToServer(eventId, myTeam.getId(), finishTime);
+        }
+    }
+
+    private void sendFinishTimeToServer(int eventId, int teamId, long finishTime) {
+        ApiService apiService = ApiClient.getApiService();
+        String token = new SharedPrefs(this).getToken();
+        apiService.setTeamFinishTime("Bearer " + token, eventId, teamId, finishTime)
+            .enqueue(new retrofit2.Callback<Void>() {
+                @Override
+                public void onResponse(retrofit2.Call<Void> call, retrofit2.Response<Void> response) {}
+                @Override
+                public void onFailure(retrofit2.Call<Void> call, Throwable t) {}
+            });
+    }
+
+    private void goToNextRiddle() {
+        currentRiddleIndex++;
+        updateTeamRiddleProgressOnServer(currentRiddleIndex);
+        showCurrentRiddle();
+    }
+
+    private void onAllRiddlesCompleted() {
+        long finishTime = System.currentTimeMillis();
+        if (myTeam != null) {
+            sendFinishTimeToServer(eventId, myTeam.getId(), finishTime);
+        }
+        showCompletionScreen();
+    }
+
+    private void checkAnswerAndProceed() {
+        if (currentRiddleIndex == riddleList.size() - 1) {
+            onAllRiddlesCompleted();
+        } else {
+            goToNextRiddle();
+        }
+    }
+
+    private void showCompletionScreen() {
+        tvQuestion.setVisibility(View.GONE);
+        checkBtn.setVisibility(View.GONE);
+        tvRiddleNumber.setVisibility(View.GONE);
+        tvResult.setVisibility(View.VISIBLE);
+        tvResult.setText("Поздравляем! Вы прошли все загадки.");
     }
 }
