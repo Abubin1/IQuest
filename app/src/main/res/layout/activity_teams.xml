@@ -17,11 +17,11 @@
 
     <Button
         android:id="@+id/btnCreateTeam"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Создать новую команду"
         android:layout_marginBottom="24dp"
-        android:backgroundTint="@color/blue"
         android:textColor="@android:color/white"/>
 
     <TextView
@@ -61,6 +61,7 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
+        style="@style/BottomNavStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

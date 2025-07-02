@@ -2,8 +2,11 @@ package com.proj.quest.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +18,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.proj.quest.Group.GroupActivity;
 import com.proj.quest.R;
 import com.proj.quest.Riddle.RiddleActivity;
+import com.proj.quest.Theme.BaseActivity;
+import com.proj.quest.Theme.ThemeHelper;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
 import com.proj.quest.leaderboard.LeaderboardActivity;
@@ -30,7 +35,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends BaseActivity {
+
+    private int currentThemeIndex = 0;
     private ImageView profileImage;
     private Button logoutBtn;
     private ApiService apiService;
@@ -43,6 +50,36 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        Button btnChangeTheme = findViewById(R.id.ThemeButton);
+        currentThemeIndex = ThemeHelper.getSavedTheme(this);
+
+        // Создаем меню для выбора темы
+        PopupMenu themeMenu = new PopupMenu(this, btnChangeTheme);
+
+        // Добавляем пункты меню
+        for (int i = 0; i < ThemeHelper.APP_THEMES.length; i++) {
+            themeMenu.getMenu().add(0, i, i, "Тема " + (i + 1));
+        }
+
+        // Обработчик выбора темы
+        themeMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                currentThemeIndex = item.getItemId();
+                ThemeHelper.saveTheme(ProfileActivity.this, currentThemeIndex);
+                recreate();
+                return true;
+            }
+        });
+
+        // Открываем меню при нажатии на кнопку
+        btnChangeTheme.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                themeMenu.show();
+            }
+        });
 
         profileImage = findViewById(R.id.profileImage);
         logoutBtn = findViewById(R.id.logoutBtn);

@@ -13,11 +13,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.proj.quest.R;
+import com.proj.quest.Theme.BaseActivity;
 
 import java.util.Calendar;
 import java.util.Locale;
 
-public class CreateEventActivity extends AppCompatActivity {
+public class CreateEventActivity extends BaseActivity {
 
     private TextInputEditText etEventName, etEventDescription, etEventStartPlace, etMaxTeamMembers, etRiddleCount, etMaxTeams;
     private Button btnSelectDate, btnSelectTime, btnNext;

@@ -17,6 +17,7 @@
 
     <Button
         android:id="@+id/confirm_button"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

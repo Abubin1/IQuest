@@ -37,6 +37,7 @@
 
         <Button
             android:id="@+id/btnAcceptInvite"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -45,6 +46,7 @@
 
         <Button
             android:id="@+id/btnDeclineInvite"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

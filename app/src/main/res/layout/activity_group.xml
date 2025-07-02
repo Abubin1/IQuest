@@ -63,6 +63,7 @@
 
     <Button
         android:id="@+id/leaderboardTeams"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/cardView"
@@ -72,7 +73,6 @@
         android:gravity="center"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="58dp"
-        android:backgroundTint="@color/blue"
         android:text="Таблица лидеров команд" />
 
     <!-- Секция мероприятий -->
@@ -141,6 +141,7 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
+        style="@style/BottomNavStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

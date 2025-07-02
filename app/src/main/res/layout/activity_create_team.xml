@@ -32,10 +32,10 @@
 
     <Button
         android:id="@+id/btnCreateTeam"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Создать команду"
-        android:backgroundTint="@color/blue"
         android:textColor="@android:color/white"
         android:layout_marginTop="16dp"/>
 

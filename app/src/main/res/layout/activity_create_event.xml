@@ -69,6 +69,7 @@
             <Button
                 android:id="@+id/btnSelectDate"
                 android:layout_width="0dp"
+                android:backgroundTint="?attr/colorButtonNormal"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="Выбрать дату"
@@ -92,6 +93,7 @@
                 android:id="@+id/btnSelectTime"
                 android:layout_width="0dp"
                 android:layout_weight="1"
+                android:backgroundTint="?attr/colorButtonNormal"
                 android:layout_height="wrap_content"
                 android:text="Выбрать время"
                 android:layout_marginEnd="8dp"/>
@@ -145,6 +147,7 @@
 
         <Button
             android:id="@+id/btnNext"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Далее"

@@ -38,6 +38,7 @@
         android:inputType="textPassword"/>
 
     <com.google.android.material.button.MaterialButton
+        android:backgroundTint="?attr/colorButtonNormal"
         android:id="@+id/btnRegister"
         android:layout_width="300dp"
         android:layout_height="wrap_content"

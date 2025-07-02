@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.proj.quest.Group.GroupActivity;
 import com.proj.quest.R;
+import com.proj.quest.Theme.BaseActivity;
 import com.proj.quest.leaderboard.LeaderboardActivity;
 import com.proj.quest.models.Team;
 import com.proj.quest.api.ApiClient;
@@ -33,7 +34,7 @@ import java.util.LinkedHashMap;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class TeamsActivity extends AppCompatActivity {
+public class TeamsActivity extends BaseActivity {
     private ListView listViewTeams;
     private ListView listViewInvites;
     private TextView tvMyTeams;

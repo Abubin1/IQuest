@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.proj.quest.R;
+import com.proj.quest.Theme.BaseActivity;
 import com.proj.quest.models.Team;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
@@ -19,7 +20,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateTeamActivity extends AppCompatActivity {
+public class CreateTeamActivity extends BaseActivity {
     private EditText etTeamName;
     private Button btnCreateTeam;
     private ApiService apiService;

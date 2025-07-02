@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.proj.quest.R;
+import com.proj.quest.Theme.BaseActivity;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
 import com.proj.quest.leaderboard.LeaderboardActivity;
@@ -42,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GroupActivity extends AppCompatActivity {
+public class GroupActivity extends BaseActivity {
     private Button btn_invent, btn_leaderboardTeams, btnDeleteGroup;
     private ListView listView, invitesListView, eventsListView;
     private TextView tvTotalPoints, tvGroupName;

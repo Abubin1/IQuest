@@ -30,6 +30,7 @@
         android:id="@+id/btnCreateGroup"
         style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView"
         android:layout_marginStart="30dp"
@@ -41,6 +42,7 @@
         android:id="@+id/btnOfflineGroup"
         style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_height="wrap_content"
         android:layout_below="@+id/btnCreateGroup"
         android:layout_marginStart="30dp"
@@ -50,6 +52,7 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
+        style="@style/BottomNavStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

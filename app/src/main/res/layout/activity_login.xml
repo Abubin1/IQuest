@@ -31,6 +31,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogin"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Войти"
@@ -39,6 +40,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnOfflineMode"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Войти без"
@@ -47,6 +49,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnGoToRegister"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
