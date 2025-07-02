@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@drawable/background_land"
     android:padding="16dp">
 
     <TextView
@@ -10,6 +11,7 @@
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:text="Регистрация"
+        android:textColor="@color/white"
         android:layout_marginTop="25dp"
         android:textSize="20sp"/>
 
@@ -17,6 +19,8 @@
         android:id="@+id/etLogin"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:textColorHint="@color/gray"
         android:hint="Имя пользователя"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"/>
@@ -26,6 +30,8 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:hint="Email"
+        android:backgroundTint="@color/white"
+        android:textColorHint="@color/gray"
         android:layout_gravity="center"
         android:inputType="textEmailAddress"/>
 
@@ -34,6 +40,8 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:hint="Пароль"
+        android:backgroundTint="@color/white"
+        android:textColorHint="@color/gray"
         android:layout_gravity="center"
         android:inputType="textPassword"/>
 
@@ -43,6 +51,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_gravity="center"
+        android:backgroundTint="@color/blue"
+        android:textColor="@color/white"
         style="@style/Widget.MaterialComponents.Button"
         android:text="Зарегистрироваться"/>
 </LinearLayout>

@@ -9,18 +9,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottom_navigation"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:padding="8dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Аватарка профиля -->
             <LinearLayout
-                android:id="@+id/top_block"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginBottom="24dp">
 
                 <ImageView
                     android:id="@+id/profileImage"
@@ -30,63 +34,126 @@
                     android:contentDescription="Фото профиля"
                     android:scaleType="centerCrop"
                     android:src="@drawable/profile" />
+            </LinearLayout>
 
+            <!-- Информация о пользователе -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="8dp">
+
+                <!-- Имя пользователя -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="16dp">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Имя:"
+                        android:textStyle="bold"
+                        android:textSize="18sp" />
 
                     <TextView
                         android:id="@+id/tvLogin"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Логин"
+                        android:layout_marginStart="5dp"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <!-- Email -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Email:"
                         android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:layout_marginBottom="8dp" />
+                        android:textSize="18sp"/>
 
                     <TextView
                         android:id="@+id/tvEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Email"
-                        android:layout_marginBottom="8dp" />
+                        android:text=""
+                        android:layout_marginStart="5dp"
+                        android:textSize="15sp"/>
+                </LinearLayout>
+
+                <!-- Дата регистрации -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Дата регистрации:"
+                        android:textStyle="bold"
+                        android:textSize="18sp"/>
 
                     <TextView
                         android:id="@+id/tvRegDate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Дата регистрации"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginStart="5dp"
+                        android:textSize="11sp"/>
+                </LinearLayout>
+
+                <!-- Баллы -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="24dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Баллы:"
+                        android:textStyle="bold"
+                        android:textSize="18sp"/>
 
                     <TextView
                         android:id="@+id/tvPoints"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Баллы"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginStart="5dp"
+                        android:textSize="17sp"/>
                 </LinearLayout>
+
+                <!-- Кнопки -->
+                <Button
+                    android:id="@+id/btnProfileSettings"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Настройки профиля"
+                    android:textAllCaps="false"
+                    android:layout_marginBottom="8dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                <Button
+                    android:id="@+id/logoutBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Выйти из аккаунта"
+                    android:textAllCaps="false"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
             </LinearLayout>
-
-            <Button
-                android:id="@+id/btnProfileSettings"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Настройки профиля"
-                android:layout_marginTop="16dp" />
-
-            <Button
-                android:id="@+id/logoutBtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Выйти из аккаунта"
-                android:drawableLeft="@android:drawable/ic_lock_power_off"
-                android:layout_marginTop="8dp" />
         </LinearLayout>
     </ScrollView>
 
+    <!-- Нижнее меню -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"

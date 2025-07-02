@@ -79,6 +79,9 @@ public class EventsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (searchEditText != null) {
+            searchEditText.setText(""); // Сброс поиска
+        }
         loadUserProfile(); // Загружаем данные каждый раз, когда фрагмент становится видимым
     }
 

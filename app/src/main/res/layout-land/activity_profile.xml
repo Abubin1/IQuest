@@ -38,52 +38,109 @@
                     android:orientation="vertical"
                     android:layout_marginStart="16dp">
 
-                    <TextView
-                        android:id="@+id/tvLogin"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Логин"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:layout_marginBottom="8dp" />
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
 
-                    <TextView
-                        android:id="@+id/tvEmail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Email"
-                        android:layout_marginBottom="8dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Имя:"
+                            android:textStyle="bold"
+                            android:textSize="18sp" />
 
-                    <TextView
-                        android:id="@+id/tvRegDate"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Дата регистрации"
-                        android:layout_marginBottom="8dp" />
+                        <TextView
+                            android:id="@+id/tvLogin"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:textSize="15sp" />
+                    </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tvPoints"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Баллы"
-                        android:layout_marginBottom="8dp" />
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Email:"
+                            android:textStyle="bold"
+                            android:textSize="18sp"/>
+
+                        <TextView
+                            android:id="@+id/tvEmail"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:layout_marginStart="5dp"
+                            android:textSize="15sp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Дата регистрации:"
+                            android:textStyle="bold"
+                            android:textSize="18sp"/>
+
+                        <TextView
+                            android:id="@+id/tvRegDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:textSize="11sp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="15dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Баллы:"
+                            android:textStyle="bold"
+                            android:textSize="18sp"/>
+
+                        <TextView
+                            android:id="@+id/tvPoints"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:textSize="17sp"/>
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
             <Button
                 android:id="@+id/btnProfileSettings"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:text="Настройки профиля"
-                android:layout_marginTop="16dp" />
+                android:textAllCaps="false"
+                android:layout_marginBottom="5dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
             <Button
                 android:id="@+id/logoutBtn"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:text="Выйти из аккаунта"
-                android:drawableLeft="@android:drawable/ic_lock_power_off"
-                android:layout_marginTop="8dp" />
+                android:textAllCaps="false"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
         </LinearLayout>
     </ScrollView>
 
