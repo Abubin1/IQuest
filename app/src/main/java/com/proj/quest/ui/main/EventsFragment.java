@@ -2,6 +2,8 @@ package com.proj.quest.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.proj.quest.R;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
@@ -44,6 +47,8 @@ public class EventsFragment extends Fragment {
     private List<Event> allEvents = new ArrayList<>();
     private List<Team> userTeams = new ArrayList<>();
     private MaterialButton createEventButton;
+    private TextInputEditText searchEditText;
+    private List<Event> filteredEvents = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -52,6 +57,7 @@ public class EventsFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         createEventButton = view.findViewById(R.id.createEvent);
+        searchEditText = view.findViewById(R.id.search_edit_text);
 
         adapter = new EventAdapter();
         recyclerView.setAdapter(adapter);
@@ -65,6 +71,8 @@ public class EventsFragment extends Fragment {
             startActivity(intent);
         });
 
+        setupSearch();
+
         return view;
     }
 
@@ -72,6 +80,39 @@ public class EventsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         loadUserProfile(); // Загружаем данные каждый раз, когда фрагмент становится видимым
+    }
+
+    private void setupSearch(){
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterEvents(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
+
+    private void filterEvents(String query){
+        filteredEvents.clear();
+
+        if(query.isEmpty()){
+            filteredEvents.addAll(allEvents);
+        } else{
+          String lowerCaseQuery = query.toLowerCase();
+          for(Event event : allEvents){
+              if(event.getName().toLowerCase().contains(lowerCaseQuery)){
+                  filteredEvents.add(event);
+              }
+          }
+        }
+        filterAndDisplayEvents();
     }
 
     private void loadUserProfile() {
@@ -121,6 +162,8 @@ public class EventsFragment extends Fragment {
                 if (isAdded() && getContext() != null) { // Проверяем, что фрагмент прикреплен к Activity
                     if (response.isSuccessful() && response.body() != null) {
                         allEvents = response.body();
+                        filteredEvents.clear();
+                        filteredEvents.addAll(allEvents);
                         loadUserTeams();
                     } else if (response.code() == 403) {
                         // Токен истёк или невалиден
@@ -184,7 +227,7 @@ public class EventsFragment extends Fragment {
                 break;
             }
         }
-        for (Event event : allEvents) {
+        for (Event event : filteredEvents) {
             Date eventDate = parseStartDateTime(event.getStartDate(), event.getStartTime());
             if (eventDate == null) continue;
             long eventStart = eventDate.getTime();

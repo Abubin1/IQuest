@@ -40,16 +40,6 @@
         style="@style/Widget.MaterialComponents.Button"/>
 
     <Button
-        android:id="@+id/btnOfflineMode"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:text="Войти без"
-        android:layout_gravity="center"
-        android:paddingLeft="30dp"
-        android:paddingEnd="30dp"
-        style="@style/Widget.MaterialComponents.Button"/>
-
-    <Button
         android:id="@+id/btnGoToRegister"
         android:layout_width="200dp"
         android:layout_height="wrap_content"

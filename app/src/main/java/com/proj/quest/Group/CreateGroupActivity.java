@@ -39,16 +39,10 @@ public class CreateGroupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_group);
 
-        Button test = findViewById(R.id.btnOfflineGroup);
         btnCreateGroup = findViewById(R.id.btnCreateGroup);
         etNameGroup = findViewById(R.id.etNameGroup);
         apiService = ApiClient.getApiService();
         sharedPrefs = new SharedPrefs(this);
-
-        test.setOnClickListener(v->{
-            Intent intent = new Intent(this, GroupActivity.class);
-            startActivity(intent);
-        });
 
         btnCreateGroup.setOnClickListener(v->{
             createGroup();

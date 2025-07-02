@@ -7,7 +7,7 @@
     android:padding="8dp">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/search"
+        android:id="@+id/search_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Поиск"
@@ -15,7 +15,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/search_text_input_edit_text"
+            android:id="@+id/search_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/createEvent"
-        android:layout_below="@id/search"
+        android:layout_below="@id/search_layout"
         android:fillViewport="true">
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"

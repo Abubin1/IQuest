@@ -24,7 +24,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etEmail, etPassword;
     private Button btnLogin;
     private Button btnGoToRegister;
-    private Button btnOfflineMode;
     private ApiService apiService;
     private SharedPrefs sharedPrefs;
 
@@ -37,7 +36,6 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnGoToRegister = findViewById(R.id.btnGoToRegister);
-        btnOfflineMode = findViewById(R.id.btnOfflineMode);
 
         apiService = ApiClient.getApiService();
         sharedPrefs = new SharedPrefs(this);
@@ -60,10 +58,6 @@ public class LoginActivity extends AppCompatActivity {
 
         btnGoToRegister.setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
-        });
-
-        btnOfflineMode.setOnClickListener(v -> {
-            startMainActivity();
         });
     }
 
