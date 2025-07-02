@@ -7,6 +7,7 @@
 
     <TextView
         android:id="@+id/textView"
+        android:textColor="@color/leaderboard_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -17,6 +18,7 @@
 
     <EditText
         android:id="@+id/etNameGroup"
+        android:textColor="@color/leaderboard_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView"

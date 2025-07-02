@@ -6,6 +6,7 @@
     android:padding="16dp">
 
     <TextView
+        android:textColor="@color/leaderboard_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"

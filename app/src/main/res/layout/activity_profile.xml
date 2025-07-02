@@ -33,6 +33,7 @@
 
                 <LinearLayout
                     android:layout_width="0dp"
+
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
@@ -40,6 +41,7 @@
 
                     <TextView
                         android:id="@+id/tvLogin"
+                        android:textColor="@color/leaderboard_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Логин"
@@ -48,6 +50,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <TextView
+                        android:textColor="@color/leaderboard_text"
                         android:id="@+id/tvEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -56,6 +59,7 @@
 
                     <TextView
                         android:id="@+id/tvRegDate"
+                        android:textColor="@color/leaderboard_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Дата регистрации"
@@ -63,6 +67,7 @@
 
                     <TextView
                         android:id="@+id/tvPoints"
+                        android:textColor="@color/leaderboard_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Баллы"

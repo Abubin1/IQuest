@@ -39,6 +39,7 @@
                     android:layout_marginStart="16dp">
 
                     <TextView
+                        android:textColor="@color/leaderboard_text"
                         android:id="@+id/tvLogin"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -48,6 +49,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <TextView
+                        android:textColor="@color/leaderboard_text"
                         android:id="@+id/tvEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -55,6 +57,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <TextView
+                        android:textColor="@color/leaderboard_text"
                         android:id="@+id/tvRegDate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -62,6 +65,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <TextView
+                        android:textColor="@color/leaderboard_text"
                         android:id="@+id/tvPoints"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -95,6 +99,7 @@
     </ScrollView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
+        style="@style/BottomNavStyle"
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

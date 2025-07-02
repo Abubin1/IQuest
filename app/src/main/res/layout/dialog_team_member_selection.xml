@@ -7,22 +7,22 @@
 
     <!-- Заголовок -->
     <TextView
+        android:textColor="@color/leaderboard_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/select_team_members_title"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="#333333"
         android:layout_marginBottom="8dp" />
 
     <!-- Информация о лимите -->
     <TextView
+        android:textColor="@color/leaderboard_text"
         android:id="@+id/tvMemberLimit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/max_members_limit"
         android:textSize="14sp"
-        android:textColor="#666666"
         android:layout_marginBottom="16dp" />
 
     <!-- Счетчик выбранных -->
@@ -38,6 +38,7 @@
 
     <!-- Список участников -->
     <ListView
+        android:textColor="@color/leaderboard_text"
         android:id="@+id/listViewMembers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

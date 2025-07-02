@@ -7,6 +7,7 @@
     android:padding="16dp">
 
     <TextView
+        android:textColor="@color/leaderboard_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Мои команды"
@@ -25,6 +26,7 @@
         android:textColor="@android:color/white"/>
 
     <TextView
+        android:textColor="@color/leaderboard_text"
         android:id="@+id/tvMyTeams"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -34,6 +36,7 @@
         android:layout_marginBottom="8dp"/>
 
     <ListView
+        android:textColor="@color/leaderboard_text"
         android:id="@+id/listViewTeams"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -43,6 +46,7 @@
         android:dividerHeight="1dp"/>
 
     <TextView
+        android:textColor="@color/leaderboard_text"
         android:id="@+id/tvInvites"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -52,6 +56,7 @@
         android:layout_marginBottom="8dp"/>
 
     <ListView
+        android:textColor="@color/leaderboard_text"
         android:id="@+id/listViewInvites"
         android:layout_width="match_parent"
         android:layout_height="0dp"
