@@ -173,62 +173,32 @@ public class EventsFragment extends Fragment {
 
     private void filterAndDisplayEvents() {
         Date now = new Date();
-        Event currentEvent = null;
-        Event nextEvent = null;
-        List<Event> registeredFuture = new ArrayList<>();
-        List<Event> otherFuture = new ArrayList<>();
+        Event registeredEvent = null;
+        List<Event> availableEvents = new ArrayList<>();
         List<Event> finishedEvents = new ArrayList<>();
-        // Список id мероприятий, на которые пользователь зарегистрирован
-        List<Integer> registeredEventIds = new ArrayList<>();
+        // Получаем id мероприятия, на которое команда зарегистрирована (status != completed)
+        Integer activeEventId = null;
         for (Team team : userTeams) {
             if (team.getEventId() != null) {
-                registeredEventIds.add(team.getEventId());
+                activeEventId = team.getEventId();
+                break;
             }
         }
-        // 1. Сначала разделим завершённые и будущие
-        List<Event> futureEvents = new ArrayList<>();
         for (Event event : allEvents) {
             Date eventDate = parseStartDateTime(event.getStartDate(), event.getStartTime());
             if (eventDate == null) continue;
             long eventStart = eventDate.getTime();
             long eventEnd = eventStart + 3 * 60 * 60 * 1000;
-            boolean isFinished = (event.getFinished() != null && event.getFinished()) || now.getTime() > eventEnd;
-            if (isFinished) {
+            boolean isFinished = (event.getFinished() != null && event.getFinished()) || (event.getCompletionStatus() != null && event.getCompletionStatus().equals("completed")) || now.getTime() > eventEnd;
+            if (activeEventId != null && event.getId() == activeEventId && !isFinished) {
+                registeredEvent = event;
+            } else if (!isFinished && (activeEventId == null)) {
+                availableEvents.add(event);
+            } else if (isFinished) {
                 finishedEvents.add(event);
-            } else {
-                futureEvents.add(event);
             }
         }
-        // 2. Среди будущих ищем текущее и ближайшее для зарегистрированных
-        for (Event event : futureEvents) {
-            Date eventDate = parseStartDateTime(event.getStartDate(), event.getStartTime());
-            if (eventDate == null) continue;
-            long eventStart = eventDate.getTime();
-            long eventEnd = eventStart + 3 * 60 * 60 * 1000;
-            boolean isRegistered = registeredEventIds.contains(event.getId());
-            if (isRegistered) {
-                if (now.getTime() >= eventStart && now.getTime() < eventEnd) {
-                    currentEvent = event;
-                } else if (eventStart > now.getTime()) {
-                    if (nextEvent == null || eventStart < parseStartDateTime(nextEvent.getStartDate(), nextEvent.getStartTime()).getTime()) {
-                        nextEvent = event;
-                    }
-                }
-            }
-        }
-        // 3. Зарегистрированные будущие (кроме текущего и ближайшего)
-        for (Event event : futureEvents) {
-            if (!registeredEventIds.contains(event.getId())) continue;
-            if ((currentEvent != null && event.getId() == currentEvent.getId()) || (nextEvent != null && event.getId() == nextEvent.getId())) continue;
-            registeredFuture.add(event);
-        }
-        // 4. Другие будущие (не зарегистрированные)
-        for (Event event : futureEvents) {
-            if (!registeredEventIds.contains(event.getId())) {
-                otherFuture.add(event);
-            }
-        }
-        // 5. Сортировка
+        // Сортировка
         Comparator<Event> byDate = (e1, e2) -> {
             Date d1 = parseStartDateTime(e1.getStartDate(), e1.getStartTime());
             Date d2 = parseStartDateTime(e2.getStartDate(), e2.getStartTime());
@@ -237,8 +207,7 @@ public class EventsFragment extends Fragment {
             if (d2 == null) return -1;
             return d1.compareTo(d2);
         };
-        registeredFuture.sort(byDate);
-        otherFuture.sort(byDate);
+        availableEvents.sort(byDate);
         finishedEvents.sort((e1, e2) -> {
             Date d1 = parseStartDateTime(e1.getStartDate(), e1.getStartTime());
             Date d2 = parseStartDateTime(e2.getStartDate(), e2.getStartTime());
@@ -247,8 +216,8 @@ public class EventsFragment extends Fragment {
             if (d2 == null) return -1;
             return d2.compareTo(d1); // завершённые — новые сверху
         });
-        // 6. Передаём в адаптер
-        adapter.setEvents(currentEvent, nextEvent, registeredFuture, otherFuture, finishedEvents);
+        // Передаём в адаптер
+        adapter.setEvents(registeredEvent, null, new ArrayList<>(), availableEvents, finishedEvents);
         adapter.setUserTeams(userTeams);
     }
 

@@ -81,6 +81,8 @@ public class RiddleActivity extends AppCompatActivity {
     private SharedPrefs prefs;
     private String riddleProgressKey;
     private String riddleStartTimeKey;
+    private TextView tvNextEventTimer;
+    private CountDownTimer nextEventCountDownTimer;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -128,6 +130,7 @@ public class RiddleActivity extends AppCompatActivity {
         tvQuestion = findViewById(R.id.tvQuestion);
         tvResult = findViewById(R.id.tvResult);
         checkBtn = findViewById(R.id.checkBtn);
+        tvNextEventTimer = findViewById(R.id.tvNextEventTimer);
 
         riddleList = new ArrayList<>();
         riddleAdapter = new RiddleAdapter(this, riddleList);
@@ -409,6 +412,7 @@ public class RiddleActivity extends AppCompatActivity {
                     // Переход к следующей загадке через 1 секунду
                     checkBtn.postDelayed(() -> {
                         currentRiddleIndex++;
+                        updateTeamRiddleProgressOnServer(currentRiddleIndex);
                         if (currentRiddleIndex < riddleList.size()) {
                             showCurrentRiddle();
                         } else {
@@ -617,6 +621,7 @@ public class RiddleActivity extends AppCompatActivity {
             // Отправить время на сервер
             sendFinishTimeToServer(eventId, myTeam.getId(), finishTime);
         }
+        showCompletionScreen();
     }
 
     private void sendFinishTimeToServer(int eventId, int teamId, long finishTime) {
@@ -659,5 +664,72 @@ public class RiddleActivity extends AppCompatActivity {
         tvRiddleNumber.setVisibility(View.GONE);
         tvResult.setVisibility(View.VISIBLE);
         tvResult.setText("Поздравляем! Вы прошли все загадки.");
+        showNextEventTimer();
+    }
+
+    private void showNextEventTimer() {
+        if (myTeam == null) return;
+        ApiService apiService = ApiClient.getApiService();
+        String token = new SharedPrefs(this).getToken();
+        apiService.getTeamEvents("Bearer " + token, myTeam.getId()).enqueue(new retrofit2.Callback<List<com.proj.quest.models.Event>>() {
+            @Override
+            public void onResponse(retrofit2.Call<List<com.proj.quest.models.Event>> call, retrofit2.Response<List<com.proj.quest.models.Event>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    long now = System.currentTimeMillis();
+                    com.proj.quest.models.Event nextEvent = null;
+                    long nextStart = Long.MAX_VALUE;
+                    for (com.proj.quest.models.Event event : response.body()) {
+                        if (event.getStartDate() != null && event.getStartTime() != null && (event.getCompletionStatus() == null || !event.getCompletionStatus().equals("completed"))) {
+                            String dateTime = event.getStartDate() + "T" + event.getStartTime() + ".000Z";
+                            java.text.SimpleDateFormat parser = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
+                            parser.setTimeZone(java.util.TimeZone.getTimeZone("Europe/Moscow"));
+                            try {
+                                java.util.Date eventStart = parser.parse(dateTime);
+                                if (eventStart != null && eventStart.getTime() > now && eventStart.getTime() < nextStart) {
+                                    nextStart = eventStart.getTime();
+                                    nextEvent = event;
+                                }
+                            } catch (java.text.ParseException ignored) {}
+                        }
+                    }
+                    if (nextEvent != null) {
+                        startNextEventTimer(nextStart - now);
+                    } else {
+                        tvNextEventTimer.setText("Вы не зарегистрированы на будущие мероприятия");
+                        tvNextEventTimer.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+            @Override
+            public void onFailure(retrofit2.Call<List<com.proj.quest.models.Event>> call, Throwable t) {
+                tvNextEventTimer.setText("Ошибка загрузки следующего мероприятия");
+                tvNextEventTimer.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void startNextEventTimer(long millisUntilStart) {
+        if (nextEventCountDownTimer != null) nextEventCountDownTimer.cancel();
+        if (millisUntilStart <= 0) {
+            tvNextEventTimer.setText("Мероприятие уже началось!");
+            tvNextEventTimer.setVisibility(View.VISIBLE);
+            return;
+        }
+        tvNextEventTimer.setVisibility(View.VISIBLE);
+        nextEventCountDownTimer = new CountDownTimer(millisUntilStart, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                long hours = TimeUnit.MILLISECONDS.toHours(millisUntilFinished);
+                long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60;
+                long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60;
+                String time = String.format(Locale.getDefault(), "До следующего мероприятия: %02d:%02d:%02d", hours, minutes, seconds);
+                tvNextEventTimer.setText(time);
+            }
+            @Override
+            public void onFinish() {
+                tvNextEventTimer.setText("Мероприятие началось!");
+            }
+        };
+        nextEventCountDownTimer.start();
     }
 }

@@ -84,7 +84,8 @@ public class FileUtils {
         } else if ("content".equalsIgnoreCase(uri.getScheme())) {
             try {
                 InputStream inputStream = context.getContentResolver().openInputStream(uri);
-                String fileName = "temp_" + System.currentTimeMillis();
+                String fileName = getFileName(context, uri);
+                if (fileName == null) fileName = "temp_" + System.currentTimeMillis();
                 File tempFile = new File(context.getCacheDir(), fileName);
                 OutputStream outputStream = new FileOutputStream(tempFile);
                 byte[] buf = new byte[4096];
@@ -101,5 +102,28 @@ public class FileUtils {
             }
         }
         return null;
+    }
+
+    // Получение имени файла с расширением из Uri
+    public static String getFileName(Context context, Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            try (Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int nameIndex = cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME);
+                    if (nameIndex >= 0) {
+                        result = cursor.getString(nameIndex);
+                    }
+                }
+            }
+        }
+        if (result == null) {
+            String path = uri.getPath();
+            int cut = path.lastIndexOf('/');
+            if (cut != -1) {
+                result = path.substring(cut + 1);
+            }
+        }
+        return result;
     }
 } 

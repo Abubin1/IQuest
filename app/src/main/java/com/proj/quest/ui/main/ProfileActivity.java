@@ -131,14 +131,21 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                     String avatarUrl = sharedPrefs.getAvatarUrl();
                     if ((avatarUrl != null && !avatarUrl.isEmpty())) {
+                        if (avatarUrl.startsWith("/avatars/")) {
+                            avatarUrl = ApiClient.BASE_URL + avatarUrl.substring(1);
+                        }
                         Glide.with(ProfileActivity.this)
-                            .load(avatarUrl.startsWith("http") ? avatarUrl : "http://5.175.92.194:3000" + avatarUrl)
+                            .load(avatarUrl)
                             .placeholder(R.drawable.profile)
                             .error(R.drawable.profile)
                             .into(profileImage);
                     } else if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+                        String url = user.getAvatarUrl();
+                        if (url.startsWith("/avatars/")) {
+                            url = ApiClient.BASE_URL + url.substring(1);
+                        }
                         Glide.with(ProfileActivity.this)
-                            .load(user.getAvatarUrl().startsWith("http") ? user.getAvatarUrl() : "http://5.175.92.194:3000" + user.getAvatarUrl())
+                            .load(url)
                             .placeholder(R.drawable.profile)
                             .error(R.drawable.profile)
                             .into(profileImage);

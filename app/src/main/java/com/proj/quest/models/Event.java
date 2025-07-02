@@ -30,6 +30,8 @@ public class Event implements Serializable {
     private String themeUrl;
     @SerializedName("Завершено")
     private Boolean finished;
+    @SerializedName("статус_завершения")
+    private String completionStatus;
 
     public Event() {}
 
@@ -47,6 +49,7 @@ public class Event implements Serializable {
     public String getDescription() { return description; }
     public String getThemeUrl() { return themeUrl; }
     public Boolean getFinished() { return finished; }
+    public String getCompletionStatus() { return completionStatus; }
 
     // Сеттеры
     public void setId(int id) { this.id = id; }
@@ -62,4 +65,5 @@ public class Event implements Serializable {
     public void setDescription(String description) { this.description = description; }
     public void setThemeUrl(String themeUrl) { this.themeUrl = themeUrl; }
     public void setFinished(Boolean finished) { this.finished = finished; }
+    public void setCompletionStatus(String completionStatus) { this.completionStatus = completionStatus; }
 }

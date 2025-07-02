@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 public class GroupActivity extends AppCompatActivity {
     private Button btn_invent, btn_leaderboardTeams, btnDeleteGroup;
     private ListView listView, invitesListView, eventsListView;
-    private TextView tvTotalPoints, tvGroupName;
+    private TextView tvTotalPoints, tvGroupName, tvNextEventTimerGroup;
     private ApiService apiService;
     private SharedPrefs sharedPrefs;
     private Team currentTeam;
@@ -54,6 +54,7 @@ public class GroupActivity extends AppCompatActivity {
     private List<User> allUsers = new ArrayList<>();
     private List<Event> teamEvents = new ArrayList<>();
     private ProgressBar progressBar;
+    private android.os.CountDownTimer nextEventCountDownTimerGroup;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,6 +76,7 @@ public class GroupActivity extends AppCompatActivity {
         System.out.println("DEBUG: GroupActivity onCreate - userId: " + userId);
         
         progressBar = findViewById(R.id.progressBar);
+        tvNextEventTimerGroup = findViewById(R.id.tvNextEventTimerGroup);
         showLoading(true);
         loadTeam();
         loadInvites();
@@ -160,6 +162,7 @@ public class GroupActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     teamEvents = response.body();
                     showTeamEvents();
+                    showNextEventTimerGroup();
                 }
             }
             @Override
@@ -173,35 +176,17 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     private void showTeamEvents() {
-        // Показываем только текущее или ближайшее мероприятие
-        Event currentOrNextEvent = null;
-        long now = System.currentTimeMillis();
+        // Показываем только одно активное (не завершённое) мероприятие, завершённые не отображаем
+        Event activeEvent = null;
         for (Event event : teamEvents) {
-            if (event.getStartDate() != null && event.getStartTime() != null) {
-                try {
-                    String dateTime = event.getStartDate() + "T" + event.getStartTime() + ".000Z";
-                    java.text.SimpleDateFormat parser = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
-                    parser.setTimeZone(java.util.TimeZone.getTimeZone("Europe/Moscow"));
-                    java.util.Date eventStart = parser.parse(dateTime);
-                    // Предположим, что мероприятие длится 2 часа (или добавить поле endTime, если есть)
-                    long eventDuration = 2 * 60 * 60 * 1000L;
-                    long eventEnd = eventStart.getTime() + eventDuration;
-                    if (now >= eventStart.getTime() && now < eventEnd) {
-                        // Мероприятие идет сейчас
-                        currentOrNextEvent = event;
-                        break;
-                    } else if (eventStart.getTime() > now) {
-                        // Ближайшее будущее мероприятие (если нет текущего)
-                        if (currentOrNextEvent == null || eventStart.getTime() < parser.parse(currentOrNextEvent.getStartDate() + "T" + currentOrNextEvent.getStartTime() + ".000Z").getTime()) {
-                            currentOrNextEvent = event;
-                        }
-                    }
-                } catch (Exception ignored) {}
+            boolean isFinished = (event.getCompletionStatus() != null && event.getCompletionStatus().equals("completed")) || (event.getFinished() != null && event.getFinished());
+            if (!isFinished && activeEvent == null) {
+                activeEvent = event;
             }
         }
         List<Event> filtered = new ArrayList<>();
-        if (currentOrNextEvent != null) filtered.add(currentOrNextEvent);
-        EventGroupAdapter adapter = new EventGroupAdapter(this, filtered, currentOrNextEvent != null ? currentOrNextEvent.getId() : null);
+        if (activeEvent != null) filtered.add(activeEvent);
+        EventGroupAdapter adapter = new EventGroupAdapter(this, filtered, activeEvent != null ? activeEvent.getId() : null);
         eventsListView.setAdapter(adapter);
     }
 
@@ -654,5 +639,56 @@ public class GroupActivity extends AppCompatActivity {
         findViewById(R.id.users).setVisibility(loading ? View.GONE : View.VISIBLE);
         findViewById(R.id.kick_group).setVisibility(loading ? View.GONE : View.VISIBLE);
         findViewById(R.id.bottom_navigation).setVisibility(loading ? View.GONE : View.VISIBLE);
+    }
+
+    private void showNextEventTimerGroup() {
+        long now = System.currentTimeMillis();
+        Event nextEvent = null;
+        long nextStart = Long.MAX_VALUE;
+        for (Event event : teamEvents) {
+            if (event.getStartDate() != null && event.getStartTime() != null && (event.getFinished() == null || !event.getFinished())) {
+                String dateTime = event.getStartDate() + "T" + event.getStartTime() + ".000Z";
+                java.text.SimpleDateFormat parser = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
+                parser.setTimeZone(java.util.TimeZone.getTimeZone("Europe/Moscow"));
+                try {
+                    java.util.Date eventStart = parser.parse(dateTime);
+                    if (eventStart != null && eventStart.getTime() > now && eventStart.getTime() < nextStart) {
+                        nextStart = eventStart.getTime();
+                        nextEvent = event;
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+        if (nextEvent != null) {
+            startNextEventTimerGroup(nextStart - now);
+        } else {
+            tvNextEventTimerGroup.setText("Нет ближайших мероприятий");
+            tvNextEventTimerGroup.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void startNextEventTimerGroup(long millisUntilStart) {
+        if (nextEventCountDownTimerGroup != null) nextEventCountDownTimerGroup.cancel();
+        if (millisUntilStart <= 0) {
+            tvNextEventTimerGroup.setText("Мероприятие уже началось!");
+            tvNextEventTimerGroup.setVisibility(View.VISIBLE);
+            return;
+        }
+        tvNextEventTimerGroup.setVisibility(View.VISIBLE);
+        nextEventCountDownTimerGroup = new android.os.CountDownTimer(millisUntilStart, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                long hours = java.util.concurrent.TimeUnit.MILLISECONDS.toHours(millisUntilFinished);
+                long minutes = java.util.concurrent.TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60;
+                long seconds = java.util.concurrent.TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60;
+                String time = String.format(java.util.Locale.getDefault(), "До следующего мероприятия: %02d:%02d:%02d", hours, minutes, seconds);
+                tvNextEventTimerGroup.setText(time);
+            }
+            @Override
+            public void onFinish() {
+                tvNextEventTimerGroup.setText("Мероприятие началось!");
+            }
+        };
+        nextEventCountDownTimerGroup.start();
     }
 }

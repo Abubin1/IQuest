@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.proj.quest.R;
+import com.proj.quest.api.ApiClient;
 import com.proj.quest.models.User;
 import java.util.HashSet;
 import java.util.List;
@@ -67,8 +68,12 @@ public class TeamMemberSelectionAdapter extends BaseAdapter {
         
         // Загружаем аватар
         if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+            String avatarUrl = user.getAvatarUrl();
+            if (avatarUrl.startsWith("/avatars/")) {
+                avatarUrl = ApiClient.BASE_URL + avatarUrl.substring(1);
+            }
             Glide.with(context)
-                .load(user.getAvatarUrl().startsWith("http") ? user.getAvatarUrl() : "http://5.175.92.194:3000" + user.getAvatarUrl())
+                .load(avatarUrl)
                 .placeholder(R.drawable.profile)
                 .error(R.drawable.profile)
                 .into(ivAvatar);

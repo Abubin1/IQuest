@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.proj.quest.R;
+import com.proj.quest.api.ApiClient;
 import com.proj.quest.models.User;
 
 import java.util.ArrayList;
@@ -86,8 +87,12 @@ public class UserInviteAdapter extends RecyclerView.Adapter<UserInviteAdapter.Us
 
             // Загружаем аватар
             if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+                String avatarUrl = user.getAvatarUrl();
+                if (avatarUrl.startsWith("/avatars/")) {
+                    avatarUrl = ApiClient.BASE_URL + avatarUrl.substring(1);
+                }
                 Glide.with(context)
-                    .load(user.getAvatarUrl().startsWith("http") ? user.getAvatarUrl() : "http://5.175.92.194:3000" + user.getAvatarUrl())
+                    .load(avatarUrl)
                     .placeholder(R.drawable.profile)
                     .error(R.drawable.profile)
                     .into(ivUserAvatar);

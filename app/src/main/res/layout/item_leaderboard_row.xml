@@ -21,7 +21,7 @@
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_launcher_foreground"
+        android:src="@drawable/logo"
         android:background="@drawable/circle_mask"/>
 
     <!-- Имя пользователя -->
