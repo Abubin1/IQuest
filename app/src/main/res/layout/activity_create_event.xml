@@ -14,6 +14,7 @@
 
         <TextView
             android:layout_width="wrap_content"
+            android:textColor="@color/leaderboard_text"
             android:layout_height="wrap_content"
             android:text="Создание нового мероприятия"
             android:textSize="24sp"
@@ -28,6 +29,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_marginBottom="16dp">
             <com.google.android.material.textfield.TextInputEditText
+                android:textColor="@color/leaderboard_text"
                 android:id="@+id/etEventName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -40,6 +42,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_marginBottom="16dp">
             <com.google.android.material.textfield.TextInputEditText
+                android:textColor="@color/leaderboard_text"
                 android:id="@+id/etEventDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -54,6 +57,7 @@
             android:layout_marginTop="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:textColor="@color/leaderboard_text"
                 android:id="@+id/etEventStartPlace"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -69,12 +73,14 @@
             <Button
                 android:id="@+id/btnSelectDate"
                 android:layout_width="0dp"
+                android:backgroundTint="?attr/colorButtonNormal"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="Выбрать дату"
                 android:layout_marginEnd="8dp"/>
 
             <TextView
+                android:textColor="@color/leaderboard_text"
                 android:id="@+id/tvSelectedDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -92,11 +98,13 @@
                 android:id="@+id/btnSelectTime"
                 android:layout_width="0dp"
                 android:layout_weight="1"
+                android:backgroundTint="?attr/colorButtonNormal"
                 android:layout_height="wrap_content"
                 android:text="Выбрать время"
                 android:layout_marginEnd="8dp"/>
 
             <TextView
+                android:textColor="@color/leaderboard_text"
                 android:id="@+id/tvSelectedTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -111,6 +119,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_marginBottom="16dp">
             <com.google.android.material.textfield.TextInputEditText
+                android:textColor="@color/leaderboard_text"
                 android:id="@+id/etMaxTeamMembers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -124,6 +133,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_marginBottom="16dp">
             <com.google.android.material.textfield.TextInputEditText
+                android:textColor="@color/leaderboard_text"
                 android:id="@+id/etMaxTeams"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -137,6 +147,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_marginBottom="24dp">
             <com.google.android.material.textfield.TextInputEditText
+                android:textColor="@color/leaderboard_text"
                 android:id="@+id/etRiddleCount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -145,6 +156,7 @@
 
         <Button
             android:id="@+id/btnNext"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Далее"

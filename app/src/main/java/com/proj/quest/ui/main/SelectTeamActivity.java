@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.proj.quest.R;
 import com.proj.quest.Group.GroupActivity;
+import com.proj.quest.Theme.BaseActivity;
 import com.proj.quest.models.Team;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
@@ -23,7 +24,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class SelectTeamActivity extends AppCompatActivity {
+public class SelectTeamActivity extends BaseActivity {
     private ListView listViewTeams;
     private TextView tvTitle;
     private Button btnCreateNewTeam;

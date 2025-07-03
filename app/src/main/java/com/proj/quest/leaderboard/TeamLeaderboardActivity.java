@@ -7,6 +7,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import com.proj.quest.R;
+import com.proj.quest.Theme.BaseActivity;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
 import com.proj.quest.models.TeamLeaderboardEntry;
@@ -19,7 +20,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class TeamLeaderboardActivity extends AppCompatActivity {
+public class TeamLeaderboardActivity extends BaseActivity {
     private ListView listView;
     private TeamLeaderboardAdapter adapter;
     private List<TeamLeaderboardEntry> teamList = new ArrayList<>();

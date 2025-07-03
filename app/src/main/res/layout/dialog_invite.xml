@@ -21,6 +21,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:textColor="@color/leaderboard_text"
             android:id="@+id/etLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,10 +31,10 @@
 
     <Button
         android:id="@+id/btnInvite"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Пригласить"
         android:layout_marginTop="16dp"
-        android:backgroundTint="#6200EE"
         android:textColor="#FFF"/>
 </LinearLayout>

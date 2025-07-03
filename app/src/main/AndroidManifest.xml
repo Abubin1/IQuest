@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.IQuest"
+        android:theme="@style/Theme.MyApp.Theme1"
         android:usesCleartextTraffic="true"
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="31">
@@ -38,23 +38,23 @@
         <activity
             android:name=".ui.settings.ProfileSettingsActivity"
             android:label="@string/title_activity_profile_settings"
-            android:theme="@style/Theme.IQuest.NoActionBar" />
+            android:theme="@style/Theme.MyApp.Theme1" />
         <activity
             android:name=".leaderboard.LeaderboardActivity"
             android:label="@string/title_activity_leaderboard"
-            android:theme="@style/Theme.IQuest.NoActionBar" />
+            android:theme="@style/Theme.MyApp.Theme1" />
         <activity
             android:name=".Group.CreateGroupActivity"
             android:label="@string/title_activity_create_group"
-            android:theme="@style/Theme.IQuest.NoActionBar" />
+            android:theme="@style/Theme.MyApp.Theme1" />
         <activity
             android:name=".Group.GroupActivity"
             android:label="@string/title_activity_group"
-            android:theme="@style/Theme.IQuest.NoActionBar" />
+            android:theme="@style/Theme.MyApp.Theme1" />
         <activity
             android:name=".Riddle.RiddleActivity"
             android:label="@string/title_activity_riddle"
-            android:theme="@style/Theme.IQuest.NoActionBar" />
+            android:theme="@style/Theme.MyApp.Theme1" />
         <activity android:name=".ui.main.EventDetailsActivity" />
         <activity android:name=".ui.main.TeamsActivity" />
         <activity android:name=".ui.main.SelectTeamActivity" />

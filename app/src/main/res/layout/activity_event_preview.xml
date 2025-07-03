@@ -14,6 +14,7 @@
 
         <TextView
             android:layout_width="wrap_content"
+            android:textColor="@color/leaderboard_text"
             android:layout_height="wrap_content"
             android:text="Предпросмотр мероприятия"
             android:textSize="24sp"
@@ -22,6 +23,7 @@
             android:layout_marginBottom="16dp"/>
 
         <TextView
+            android:textColor="@color/leaderboard_text"
             android:id="@+id/tvEventName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,6 +32,7 @@
             android:layout_marginBottom="8dp"/>
 
         <TextView
+            android:textColor="@color/leaderboard_text"
             android:id="@+id/tvEventDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,6 +46,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:textColor="@color/leaderboard_text"
             android:id="@+id/tvEventDateTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,6 +54,7 @@
             android:layout_marginBottom="8dp"/>
 
         <TextView
+            android:textColor="@color/leaderboard_text"
             android:id="@+id/tvMaxParticipants"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,6 +62,7 @@
             android:layout_marginBottom="16dp"/>
 
         <TextView
+            android:textColor="@color/leaderboard_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Загадки:"
@@ -88,6 +94,7 @@
 
         <Button
             android:id="@+id/btnSelectThemeImage"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Выбрать фон мероприятия"
@@ -95,6 +102,7 @@
 
         <Button
             android:id="@+id/btnConfirmAndCreate"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Подтвердить и создать"

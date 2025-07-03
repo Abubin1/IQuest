@@ -216,16 +216,17 @@
 
         <Button
             android:id="@+id/btnRegister"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Записаться на мероприятие"
             android:textSize="16sp"
             android:padding="12dp"
-            android:background="@android:color/holo_blue_dark"
             android:textColor="@android:color/white"/>
 
         <Button
             android:id="@+id/btnTeamLeaderboard"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Список команд с баллами"

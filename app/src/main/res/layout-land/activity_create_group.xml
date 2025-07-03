@@ -7,6 +7,7 @@
 
     <TextView
         android:id="@+id/textView"
+        android:textColor="@color/leaderboard_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -17,6 +18,7 @@
 
     <EditText
         android:id="@+id/etNameGroup"
+        android:textColor="@color/leaderboard_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView"
@@ -28,6 +30,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCreateGroup"
+        android:backgroundTint="?attr/colorButtonNormal"
         style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,6 +42,7 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
+        style="@style/BottomNavStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

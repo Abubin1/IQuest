@@ -7,6 +7,7 @@
 
     <TextView
         android:id="@+id/tvTeamPlace"
+        android:textColor="@color/leaderboard_text"
         android:layout_width="48dp"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -16,6 +17,7 @@
 
     <TextView
         android:id="@+id/tvTeamName"
+        android:textColor="@color/leaderboard_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -26,6 +28,7 @@
 
     <TextView
         android:id="@+id/tvTeamScore"
+        android:textColor="@color/leaderboard_text"
         android:layout_width="64dp"
         android:layout_height="wrap_content"
         android:gravity="end"

@@ -7,6 +7,7 @@
     android:gravity="center">
 
     <TextView
+        android:textColor="@color/leaderboard_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Создание команды"
@@ -22,6 +23,7 @@
         android:hint="Название команды">
 
         <EditText
+            android:textColor="@color/leaderboard_text"
             android:id="@+id/etTeamName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -32,10 +34,10 @@
 
     <Button
         android:id="@+id/btnCreateTeam"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Создать команду"
-        android:backgroundTint="@color/blue"
         android:textColor="@android:color/white"
         android:layout_marginTop="16dp"/>
 

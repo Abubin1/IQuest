@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.proj.quest.R;
+import com.proj.quest.Theme.BaseActivity;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
 import com.proj.quest.leaderboard.LeaderboardActivity;
@@ -55,7 +56,7 @@ import com.proj.quest.models.Team;
 import org.json.JSONObject;
 import okhttp3.RequestBody;
 
-public class RiddleActivity extends AppCompatActivity {
+public class RiddleActivity extends BaseActivity {
 
     private TextView timerTextView;
     private RecyclerView riddlesRecyclerView;

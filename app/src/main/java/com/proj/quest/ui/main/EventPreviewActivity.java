@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.proj.quest.R;
+import com.proj.quest.Theme.BaseActivity;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
 import com.proj.quest.models.CreateEventRequest;
@@ -37,7 +38,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class EventPreviewActivity extends AppCompatActivity {
+public class EventPreviewActivity extends BaseActivity {
 
     private CreateEventRequest eventRequest;
     private TextView tvEventName, tvEventDescription, tvEventStartPlace, tvEventDateTime, tvMaxParticipants;

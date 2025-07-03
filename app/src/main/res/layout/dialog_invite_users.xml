@@ -7,6 +7,7 @@
 
     <TextView
         android:layout_width="match_parent"
+        android:textColor="@color/leaderboard_text"
         android:layout_height="wrap_content"
         android:text="Пригласить пользователя"
         android:textSize="18sp"
@@ -19,6 +20,7 @@
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:textColor="@color/leaderboard_text"
             android:id="@+id/etSearchUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,6 +30,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:textColor="@color/leaderboard_text"
         android:id="@+id/rvUsers"
         android:layout_width="match_parent"
         android:layout_height="200dp"
@@ -40,6 +43,7 @@
         android:gravity="end">
 
         <Button
+            android:backgroundTint="?attr/colorButtonNormal"
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -47,6 +51,7 @@
             android:layout_marginEnd="8dp" />
 
         <Button
+            android:textColor="@color/leaderboard_text"
             android:id="@+id/btnInvite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -11,6 +11,7 @@
 
         <Button
             android:id="@+id/btnBack"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Назад"
@@ -19,6 +20,7 @@
 
         <ImageView
             android:id="@+id/ivAvatar"
+
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="center_horizontal"
@@ -28,6 +30,7 @@
 
         <Button
             android:id="@+id/btnChangeAvatar"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Сменить аватар"

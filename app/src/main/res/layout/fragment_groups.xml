@@ -50,23 +50,23 @@
             android:layout_marginBottom="16dp" />
 
         <TextView
+            android:textColor="@color/leaderboard_text"
             android:id="@+id/tv_no_invites"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="У вас пока нет приглашений в группу"
             android:textSize="18sp"
             android:gravity="center"
-            android:textColor="@android:color/darker_gray"
             android:layout_marginBottom="24dp" />
 
         <Button
             android:id="@+id/btn_create_group"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Создать группу"
             android:textSize="16sp"
             android:padding="12dp"
-            android:background="@drawable/button_background"
             android:textColor="@android:color/white" />
 
     </LinearLayout>

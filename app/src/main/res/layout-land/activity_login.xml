@@ -7,12 +7,12 @@
     android:padding="16dp">
 
     <TextView
+        android:textColor="@color/leaderboard_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="18sp"
         android:layout_marginTop="10dp"
-        android:textColor="@color/white"
         android:text="Вход в приложение" />
 
     <EditText
@@ -38,23 +38,23 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogin"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:text="Войти"
-        android:backgroundTint="@color/blue"
         android:textColor="@color/white"
         style="@style/Widget.MaterialComponents.Button"/>
 
     <Button
         android:id="@+id/btnGoToRegister"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="10dp"
         android:text="Регистрация"
-        android:backgroundTint="@color/blue"
         android:textColor="@color/white"
         style="@style/Widget.MaterialComponents.Button"/>
 

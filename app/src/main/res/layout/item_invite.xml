@@ -7,6 +7,7 @@
 
     <TextView
         android:id="@+id/tvInviteTeam"
+        android:textColor="@color/leaderboard_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Команда: "
@@ -15,6 +16,7 @@
 
     <TextView
         android:id="@+id/tvInviteCaptain"
+        android:textColor="@color/leaderboard_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Капитан: "
@@ -23,6 +25,7 @@
 
     <TextView
         android:id="@+id/tvInviteStatus"
+        android:textColor="@color/leaderboard_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Статус: "
@@ -37,6 +40,7 @@
 
         <Button
             android:id="@+id/btnAcceptInvite"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -45,6 +49,7 @@
 
         <Button
             android:id="@+id/btnDeclineInvite"
+            android:backgroundTint="?attr/colorButtonNormal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
