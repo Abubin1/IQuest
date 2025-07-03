@@ -6,20 +6,23 @@
 
     <style name="Theme.MyApp.Theme1" parent="Theme.MyApp">
         <item name="android:windowBackground">@drawable/back2</item>
-        <item name="leaderboardTextColor">@color/black</item>
+        <item name="leaderboardTextColor">@color/white</item>
         <item name="colorButtonNormal">@color/yellow</item>
         <item name="colorSurfaceContainer">@color/bottom_nav_color_1</item>
         <item name="android:statusBarColor">@color/bottom_nav_color_1</item>
         <item name="colorPrimaryContainer">@color/bottom_nav_color_1</item>
+        <item name="colorOnSurfaceVariant">@color/white</item>
     </style>
 
     <style name="Theme.MyApp.Theme2" parent="Theme.MyApp">
         <item name="android:windowBackground">@drawable/back3</item>
         <item name="leaderboardTextColor">@color/white</item>
         <item name="colorButtonNormal">@color/accent</item>
-        <item name="colorSurfaceContainer">@color/bottom_nav_color_2</item>
-        <item name="android:statusBarColor">@color/bottom_nav_color_2</item>
-        <item name="colorPrimaryContainer">@color/bottom_nav_color_2</item>
+        <item name="colorSurfaceContainer">@color/gray</item>
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="colorPrimaryContainer">@color/black</item>
+        <item name="colorOnPrimaryContainer">@color/black</item>
+        <item name="colorOnSurfaceVariant">@color/white</item>
     </style>
 
     <style name="Theme.MyApp.Theme3" parent="Theme.MyApp">
@@ -27,17 +30,21 @@
         <item name="leaderboardTextColor">@color/black</item>
         <item name="colorButtonNormal">@color/blue</item>
         <item name="colorSurfaceContainer">@color/bottom_nav_color_3</item>
-        <item name="android:statusBarColor">@color/bottom_nav_color_3</item>
-        <item name="colorPrimaryContainer">@color/bottom_nav_color_3</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="colorPrimaryContainer">@color/white</item>
+        <item name="colorOnSurfaceVariant">@color/black</item>
+        <item name="colorOnPrimaryContainer">@color/black</item>
     </style>
 
     <style name="Theme.MyApp.Theme4" parent="Theme.MyApp">
         <item name="android:windowBackground">@drawable/back5</item>
-        <item name="leaderboardTextColor">@color/black</item>
-        <item name="colorButtonNormal">@color/purple_500</item>
+        <item name="leaderboardTextColor">@color/white</item>
+        <item name="colorButtonNormal">@color/purple_200</item>
         <item name="colorSurfaceContainer">@color/bottom_nav_color_4</item>
-        <item name="android:statusBarColor">@color/bottom_nav_color_4</item>
-        <item name="colorPrimaryContainer">@color/bottom_nav_color_4</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="colorPrimaryContainer">@color/white</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+        <item name="colorOnSurfaceVariant">@color/white</item>
     </style>
 
     <style name="Theme.MyApp.Theme5" parent="Theme.MyApp">
@@ -47,6 +54,8 @@
         <item name="colorSurfaceContainer">@color/bottom_nav_color_5</item>
         <item name="android:statusBarColor">@color/bottom_nav_color_5</item>
         <item name="colorPrimaryContainer">@color/bottom_nav_color_5</item>
+        <item name="colorOnPrimaryContainer">@color/black</item>
+        <item name="colorOnSurfaceVariant">@color/white</item>
     </style>
 
     <style name="BottomNavStyle" parent="Widget.Material3.BottomNavigationView">

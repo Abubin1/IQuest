@@ -41,6 +41,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Логин"
+            android:textColorHint="?attr/leaderboardTextColor"
+            android:textColor="?attr/leaderboardTextColor"
+            android:backgroundTint="?attr/leaderboardTextColor"
             android:layout_marginTop="16dp" />
 
         <EditText
@@ -49,6 +52,9 @@
             android:layout_height="wrap_content"
             android:hint="Email"
             android:inputType="textEmailAddress"
+            android:textColorHint="?attr/leaderboardTextColor"
+            android:textColor="?attr/leaderboardTextColor"
+            android:backgroundTint="?attr/leaderboardTextColor"
             android:layout_marginTop="8dp" />
 
         <EditText
@@ -56,7 +62,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Новый пароль"
+            android:textColorHint="@color/gray"
             android:inputType="textPassword"
+            android:textColor="?attr/leaderboardTextColor"
+            android:backgroundTint="?attr/leaderboardTextColor"
             android:layout_marginTop="8dp" />
 
         <Button

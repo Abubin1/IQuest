@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:text="Таблица лидеров"
-        android:textColor="@color/leaderboard_text"
+        android:textColor="?attr/leaderboardTextColor"
         android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center"

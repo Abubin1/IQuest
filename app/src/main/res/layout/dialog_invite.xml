@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:backgroundTint="@color/blue"
     android:padding="16dp">
 
     <TextView
@@ -10,7 +11,7 @@
         android:layout_height="wrap_content"
         android:text="Пригласить участника"
         android:textSize="18sp"
-        android:textColor="#000"
+        android:textColor="?attr/leaderboardTextColor"
         android:textStyle="bold"
         android:layout_marginBottom="16dp"/>
 
@@ -18,13 +19,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Введите логин"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
 
         <com.google.android.material.textfield.TextInputEditText
             android:textColor="@color/leaderboard_text"
             android:id="@+id/etLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:textColorHint="@color/black"
             android:inputType="text"
             android:maxLines="1"/>
     </com.google.android.material.textfield.TextInputLayout>

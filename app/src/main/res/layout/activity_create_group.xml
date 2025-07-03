@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/textView"
-        android:textColor="@color/leaderboard_text"
+        android:textColor="?attr/leaderboardTextColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -18,20 +18,23 @@
 
     <EditText
         android:id="@+id/etNameGroup"
-        android:textColor="@color/leaderboard_text"
+        android:textColor="?attr/leaderboardTextColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView"
         android:layout_marginStart="20dp"
         android:layout_marginTop="25dp"
         android:layout_marginEnd="20dp"
+        android:backgroundTint="?attr/leaderboardTextColor"
         android:hint="Название группы"
+        android:textColorHint="@color/gray"
         android:inputType="textEmailAddress" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCreateGroup"
         style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"
+        android:textColor="@color/white"
         android:backgroundTint="?attr/colorButtonNormal"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView"

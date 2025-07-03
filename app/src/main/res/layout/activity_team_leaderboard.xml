@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:background="@color/leaderboard_header"
             android:text="Командный рейтинг"
-            android:textColor="@color/leaderboard_text"
+            android:textColor="?attr/leaderboardTextColor"
             android:textSize="24sp"
             android:textStyle="bold"
             android:gravity="center"

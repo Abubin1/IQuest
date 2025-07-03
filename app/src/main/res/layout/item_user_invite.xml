@@ -21,7 +21,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:textColor="@color/leaderboard_text"
+            android:textColor="?attr/leaderboardTextColor"
             android:id="@+id/tvUserName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:textColor="@color/leaderboard_text"
+            android:textColor="?attr/leaderboardTextColor"
             android:id="@+id/tvUserScore"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

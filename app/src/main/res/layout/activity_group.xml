@@ -12,7 +12,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:textColor="@color/leaderboard_text"
+            android:textColor="?attr/leaderboardTextColor"
             android:id="@+id/group_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

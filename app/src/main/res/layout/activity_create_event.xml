@@ -14,7 +14,7 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:textColor="@color/leaderboard_text"
+            android:textColor="?attr/leaderboardTextColor"
             android:layout_height="wrap_content"
             android:text="Создание нового мероприятия"
             android:textSize="24sp"
@@ -26,10 +26,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Название мероприятия"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:textColorHint="@color/black"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
             android:layout_marginBottom="16dp">
             <com.google.android.material.textfield.TextInputEditText
-                android:textColor="@color/leaderboard_text"
+                android:textColor="@color/black"
                 android:id="@+id/etEventName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -39,10 +40,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Описание"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:textColorHint="@color/black"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
             android:layout_marginBottom="16dp">
             <com.google.android.material.textfield.TextInputEditText
-                android:textColor="@color/leaderboard_text"
+                android:textColor="@color/black"
                 android:id="@+id/etEventDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -54,10 +56,12 @@
             android:id="@+id/tilEventStartPlace"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:textColorHint="@color/black"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:textColor="@color/leaderboard_text"
+                android:textColor="@color/black"
                 android:id="@+id/etEventStartPlace"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -77,10 +81,11 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="Выбрать дату"
+                android:layout_marginTop="5dp"
                 android:layout_marginEnd="8dp"/>
 
             <TextView
-                android:textColor="@color/leaderboard_text"
+                android:textColor="?attr/leaderboardTextColor"
                 android:id="@+id/tvSelectedDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -104,7 +109,7 @@
                 android:layout_marginEnd="8dp"/>
 
             <TextView
-                android:textColor="@color/leaderboard_text"
+                android:textColor="?attr/leaderboardTextColor"
                 android:id="@+id/tvSelectedTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -116,10 +121,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Макс. человек в команде"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:textColorHint="@color/black"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
             android:layout_marginBottom="16dp">
             <com.google.android.material.textfield.TextInputEditText
-                android:textColor="@color/leaderboard_text"
+                android:textColor="@color/black"
                 android:id="@+id/etMaxTeamMembers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -130,10 +136,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Макс. команд"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:textColorHint="@color/black"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
             android:layout_marginBottom="16dp">
             <com.google.android.material.textfield.TextInputEditText
-                android:textColor="@color/leaderboard_text"
+                android:textColor="@color/black"
                 android:id="@+id/etMaxTeams"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -144,10 +151,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Количество загадок"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:textColorHint="@color/black"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
             android:layout_marginBottom="24dp">
             <com.google.android.material.textfield.TextInputEditText
-                android:textColor="@color/leaderboard_text"
+                android:textColor="@color/black"
                 android:id="@+id/etRiddleCount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

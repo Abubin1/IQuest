@@ -79,7 +79,7 @@
                 android:text="Загадка 1"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="@color/black"
+                android:textColor="?attr/leaderboardTextColor"
                 android:background="@drawable/bg_blur_rect"
                 android:padding="12dp" />
 
@@ -91,7 +91,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Текст вопроса"
                 android:textSize="16sp"
-                android:textColor="@color/black"
+                android:textColor="?attr/leaderboardTextColor"
                 android:background="@drawable/bg_blur_rect"
                 android:padding="12dp"
                 android:gravity="center" />
@@ -131,6 +131,7 @@
                 android:backgroundTint="?attr/colorButtonNormal"
                 android:id="@+id/checkBtn"
                 android:layout_width="300dp"
+                android:textSize="18dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"

@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/tvTitle"
-        android:textColor="@color/leaderboard_text"
+        android:textColor="?attr/leaderboardTextColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Выберите команду"
@@ -26,7 +26,7 @@
         android:textColor="@android:color/white"/>
 
     <TextView
-        android:textColor="@color/leaderboard_text"
+        android:textColor="?attr/leaderboardTextColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Ваши команды:"

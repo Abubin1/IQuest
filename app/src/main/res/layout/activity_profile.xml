@@ -51,6 +51,7 @@
                     android:layout_marginBottom="16dp">
 
                     <TextView
+                        android:textColor="?attr/leaderboardTextColor"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Имя:"
@@ -59,7 +60,7 @@
 
                     <TextView
                         android:id="@+id/tvLogin"
-                        android:textColor="@color/leaderboard_text"
+                        android:textColor="?attr/leaderboardTextColor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
@@ -76,12 +77,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textColor="?attr/leaderboardTextColor"
                         android:text="Email:"
                         android:textStyle="bold"
                         android:textSize="18sp"/>
 
                     <TextView
-                        android:textColor="@color/leaderboard_text"
+                        android:textColor="?attr/leaderboardTextColor"
                         android:id="@+id/tvEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -101,14 +103,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Дата регистрации:"
+                        android:textColor="?attr/leaderboardTextColor"
                         android:textStyle="bold"
                         android:textSize="18sp"/>
 
                     <TextView
                         android:id="@+id/tvRegDate"
-                        android:textColor="@color/leaderboard_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="?attr/leaderboardTextColor"
                         android:layout_marginStart="5dp"
                         android:textSize="11sp"/>
                 </LinearLayout>
@@ -124,12 +127,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Баллы:"
+                        android:textColor="?attr/leaderboardTextColor"
                         android:textStyle="bold"
                         android:textSize="18sp"/>
 
                     <TextView
                         android:id="@+id/tvPoints"
-                        android:textColor="@color/leaderboard_text"
+                        android:textColor="?attr/leaderboardTextColor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
@@ -139,6 +143,7 @@
                 <!-- Кнопки -->
                 <Button
                     android:id="@+id/btnProfileSettings"
+                    android:textColor="@color/white"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:text="Настройки профиля"
@@ -153,6 +158,8 @@
                     android:layout_height="48dp"
                     android:text="Выйти из аккаунта"
                     android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/red"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
                 <Button
                     android:id="@+id/ThemeButton"
@@ -160,7 +167,10 @@
                     android:backgroundTint="?attr/colorButtonNormal"
                     android:layout_height="wrap_content"
                     android:text="Сменить тему"
-                    android:layout_marginTop="8dp" />
+                    android:textColor="@color/white"
+                    android:textAllCaps="false"
+                    android:layout_marginTop="8dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

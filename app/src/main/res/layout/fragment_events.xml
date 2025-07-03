@@ -11,14 +11,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Поиск"
+        android:textColorHint="@color/black"
         android:layout_margin="10dp"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/search_edit_text"
+            android:background="@color/white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
+            android:textColor="@color/black"
             android:singleLine="true"
             android:drawableEnd="@drawable/ic_search"
             android:paddingEnd="28dp"/>
@@ -47,6 +50,5 @@
         android:layout_margin="16dp"
         android:text="Создать квест"
         android:textSize="18sp"
-        app:backgroundTint="@color/yellow"
-        android:textColor="@android:color/black"/>
+        app:backgroundTint="?attr/colorButtonNormal" />
 </RelativeLayout>

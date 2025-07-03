@@ -12,7 +12,7 @@
         android:id="@+id/positionTextView"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
-        android:textColor="@color/leaderboard_text"
+        android:textColor="?attr/leaderboardTextColor"
         android:textSize="16sp"/>
 
     <!-- Аватар пользователя -->
@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:paddingStart="16dp"
-        android:textColor="@color/leaderboard_text"
+        android:textColor="?attr/leaderboardTextColor"
         android:textSize="16sp"/>
 
     <!-- Очки -->
@@ -41,6 +41,6 @@
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:gravity="end"
-        android:textColor="@color/leaderboard_text"
+        android:textColor="?attr/leaderboardTextColor"
         android:textSize="16sp"/>
 </LinearLayout>

@@ -13,7 +13,7 @@
         android:textStyle="bold"
         android:gravity="center"
         android:layout_marginBottom="24dp"
-        android:textColor="@android:color/black" />
+        android:textColor="?attr/leaderboardTextColor" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -50,7 +50,7 @@
             android:layout_marginBottom="16dp" />
 
         <TextView
-            android:textColor="@color/leaderboard_text"
+            android:textColor="?attr/leaderboardTextColor"
             android:id="@+id/tv_no_invites"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
