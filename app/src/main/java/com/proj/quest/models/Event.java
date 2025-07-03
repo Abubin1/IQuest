@@ -26,7 +26,7 @@ public class Event implements Serializable {
     private String organizer;
     @SerializedName("Описание")
     private String description;
-    @SerializedName("theme_url")
+    @SerializedName("themeUrl")
     private String themeUrl;
     @SerializedName("Завершено")
     private Boolean finished;

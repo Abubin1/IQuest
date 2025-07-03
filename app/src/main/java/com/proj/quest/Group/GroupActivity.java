@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GroupActivity extends BaseActivity {
-    private Button btn_invent, btn_leaderboardTeams, btnDeleteGroup;
+    private Button btn_invent, btnDeleteGroup;
     private ListView listView, invitesListView, eventsListView;
     private TextView tvTotalPoints, tvGroupName, tvNextEventTimerGroup;
     private ApiService apiService;
@@ -63,7 +63,6 @@ public class GroupActivity extends BaseActivity {
         setContentView(R.layout.activity_group);
 
         btn_invent = findViewById(R.id.btn_invent);
-        btn_leaderboardTeams = findViewById(R.id.leaderboardTeams);
         btnDeleteGroup = findViewById(R.id.kick_group);
         listView = findViewById(R.id.users);
         tvTotalPoints = findViewById(R.id.total_points);
@@ -84,8 +83,6 @@ public class GroupActivity extends BaseActivity {
         loadAllUsers();
 
         btn_invent.setOnClickListener(v -> showInviteDialog());
-
-        btn_leaderboardTeams.setOnClickListener(v -> showLeaderboardTeams());
 
         btnDeleteGroup.setOnClickListener(v -> {
             if (currentTeam != null && currentTeam.getCaptainId() == userId) {
@@ -375,97 +372,6 @@ public class GroupActivity extends BaseActivity {
         dialog.show();
     }
 
-    private void showLeaderboardTeams(){
-        final Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_team_leaders);
-
-        dialog.setCancelable(true);
-
-        ListView tableTeams = findViewById(R.id.listLeaderboardTeams);
-
-        dialog.findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
-        
-        dialog.show();
-    }
-
-    private void loadInvites() {
-        String token = sharedPrefs.getToken();
-        apiService.getInvites("Bearer " + token).enqueue(new Callback<List<InviteResponse>>() {
-            @Override
-            public void onResponse(Call<List<InviteResponse>> call, Response<List<InviteResponse>> response) {
-                if (isFinishing() || isDestroyed()) {
-                    return; // Активность уничтожена
-                }
-                
-                if (response.isSuccessful() && response.body() != null) {
-                    invites = response.body();
-                    showInvites();
-                }
-            }
-            @Override
-            public void onFailure(Call<List<InviteResponse>> call, Throwable t) {
-                if (isFinishing() || isDestroyed()) {
-                    return; // Активность уничтожена
-                }
-            }
-        });
-    }
-
-    private void showInvites() {
-        InviteAdapter adapter = new InviteAdapter(this, invites, this::acceptInvite, this::declineInvite);
-        invitesListView.setAdapter(adapter);
-    }
-
-    private void acceptInvite(InviteResponse invite) {
-        String token = sharedPrefs.getToken();
-        apiService.acceptInvite("Bearer " + token, invite.getId()).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (isFinishing() || isDestroyed()) {
-                    return; // Активность уничтожена
-                }
-                if (response.isSuccessful()) {
-                    Toast.makeText(GroupActivity.this, "Приглашение принято", Toast.LENGTH_SHORT).show();
-                    loadInvites();
-                } else {
-                    showErrorDialog("Ошибка", "Ошибка принятия приглашения");
-                }
-            }
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                if (isFinishing() || isDestroyed()) {
-                    return; // Активность уничтожена
-                }
-                showErrorDialog("Ошибка сети", "Не удалось принять приглашение. Проверьте подключение к интернету.");
-            }
-        });
-    }
-
-    private void declineInvite(InviteResponse invite) {
-        String token = sharedPrefs.getToken();
-        apiService.declineInvite("Bearer " + token, invite.getId()).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (isFinishing() || isDestroyed()) {
-                    return; // Активность уничтожена
-                }
-                if (response.isSuccessful()) {
-                    Toast.makeText(GroupActivity.this, "Приглашение отклонено", Toast.LENGTH_SHORT).show();
-                    loadInvites();
-                } else {
-                    showErrorDialog("Ошибка", "Ошибка отклонения приглашения");
-                }
-            }
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                if (isFinishing() || isDestroyed()) {
-                    return; // Активность уничтожена
-                }
-                showErrorDialog("Ошибка сети", "Не удалось отклонить приглашение. Проверьте подключение к интернету.");
-            }
-        });
-    }
-
     private void inviteUser(String login) {
         String token = sharedPrefs.getToken();
         apiService.findUserByLogin("Bearer " + token, login).enqueue(new Callback<User>() {
@@ -630,10 +536,8 @@ public class GroupActivity extends BaseActivity {
 
     private void showLoading(boolean loading) {
         if (progressBar != null) progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
-        // Можно скрывать основной layout, если loading == true
         findViewById(R.id.linearLayout).setVisibility(loading ? View.GONE : View.VISIBLE);
         findViewById(R.id.cardView).setVisibility(loading ? View.GONE : View.VISIBLE);
-        findViewById(R.id.leaderboardTeams).setVisibility(loading ? View.GONE : View.VISIBLE);
         findViewById(R.id.tvEventsTitle).setVisibility(loading ? View.GONE : View.VISIBLE);
         findViewById(R.id.events_list).setVisibility(loading ? View.GONE : View.VISIBLE);
         findViewById(R.id.tvParticipantsTitle).setVisibility(loading ? View.GONE : View.VISIBLE);
@@ -691,5 +595,40 @@ public class GroupActivity extends BaseActivity {
             }
         };
         nextEventCountDownTimerGroup.start();
+    }
+
+    private void loadInvites() {
+        String token = sharedPrefs.getToken();
+        apiService.getInvites("Bearer " + token).enqueue(new Callback<List<InviteResponse>>() {
+            @Override
+            public void onResponse(Call<List<InviteResponse>> call, Response<List<InviteResponse>> response) {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                if (response.isSuccessful() && response.body() != null) {
+                    invites = response.body();
+                    showInvites();
+                }
+            }
+            @Override
+            public void onFailure(Call<List<InviteResponse>> call, Throwable t) {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+            }
+        });
+    }
+
+    private void showInvites() {
+        InviteAdapter adapter = new InviteAdapter(this, invites, this::acceptInvite, this::declineInvite);
+        invitesListView.setAdapter(adapter);
+    }
+
+    private void acceptInvite(InviteResponse invite) {
+        loadInvites();
+    }
+
+    private void declineInvite(InviteResponse invite) {
+        loadInvites();
     }
 }

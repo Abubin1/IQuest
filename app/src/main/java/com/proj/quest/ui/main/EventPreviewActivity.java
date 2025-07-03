@@ -43,7 +43,7 @@ public class EventPreviewActivity extends BaseActivity {
     private CreateEventRequest eventRequest;
     private TextView tvEventName, tvEventDescription, tvEventStartPlace, tvEventDateTime, tvMaxParticipants;
     private LinearLayout riddlesContainer;
-    private Button btnConfirmAndCreate, btnSelectThemeImage;
+    private Button btnConfirmAndCreate, btnSelectThemeImage, btnFullScreenPreview;
     private ImageView ivThemePreview;
 
     private Uri selectedImageUri;
@@ -66,6 +66,16 @@ public class EventPreviewActivity extends BaseActivity {
         populateData();
         setupImagePicker();
         setupButtons();
+
+        // Если пришёл флаг fullscreen, делаем Activity полноэкранной
+        if (getIntent().getBooleanExtra("fullscreen", false)) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                android.view.View.SYSTEM_UI_FLAG_FULLSCREEN |
+                android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            );
+            if (getSupportActionBar() != null) getSupportActionBar().hide();
+        }
     }
 
     private void initViews() {
@@ -78,6 +88,7 @@ public class EventPreviewActivity extends BaseActivity {
         btnConfirmAndCreate = findViewById(R.id.btnConfirmAndCreate);
         btnSelectThemeImage = findViewById(R.id.btnSelectThemeImage);
         ivThemePreview = findViewById(R.id.ivThemePreview);
+        btnFullScreenPreview = findViewById(R.id.btnFullScreenPreview);
     }
 
     private void populateData() {
@@ -125,6 +136,21 @@ public class EventPreviewActivity extends BaseActivity {
                 return;
             }
             createEvent();
+        });
+
+        btnFullScreenPreview.setOnClickListener(v -> {
+            if (eventRequest.getRiddles() != null && !eventRequest.getRiddles().isEmpty()) {
+                Intent intent = new Intent(this, com.proj.quest.ui.main.RiddlePreviewActivity.class);
+                intent.putExtra("RIDDLE_TEXT", eventRequest.getRiddles().get(0).getRiddle_text());
+                if (selectedImageUri != null) {
+                    intent.putExtra("EVENT_THEME_URI", selectedImageUri.toString());
+                } else if (eventRequest.getTheme_url() != null) {
+                    intent.putExtra("EVENT_THEME_URL", eventRequest.getTheme_url());
+                }
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Нет загадок для предпросмотра", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

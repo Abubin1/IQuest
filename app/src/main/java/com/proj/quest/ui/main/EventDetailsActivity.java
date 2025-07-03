@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ListView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,20 +23,22 @@ import com.proj.quest.models.TeamRegistrationResponse;
 import com.proj.quest.Group.CreateGroupActivity;
 import com.proj.quest.utils.SharedPrefs;
 import com.proj.quest.ui.adapters.TeamMemberSelectionAdapter;
-
+import com.proj.quest.models.RegisteredTeamProgress;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import com.bumptech.glide.Glide;
 
 public class EventDetailsActivity extends BaseActivity {
     private Event event;
@@ -58,12 +60,40 @@ public class EventDetailsActivity extends BaseActivity {
             return;
         }
 
+        // Установка фонового изображения мероприятия
+        // if (event.getThemeUrl() != null && !event.getThemeUrl().isEmpty()) {
+        //     final View rootView = findViewById(android.R.id.content);
+        //     Glide.with(this)
+        //         .load(event.getThemeUrl())
+        //         .placeholder(R.color.white)
+        //         .error(R.color.white)
+        //         .into(new com.bumptech.glide.request.target.CustomTarget<android.graphics.drawable.Drawable>() {
+        //             @Override
+        //             public void onResourceReady(android.graphics.drawable.Drawable resource, com.bumptech.glide.request.transition.Transition<? super android.graphics.drawable.Drawable> transition) {
+        //                 rootView.setBackground(resource);
+        //             }
+        //             @Override
+        //             public void onLoadCleared(android.graphics.drawable.Drawable placeholder) {
+        //                 rootView.setBackground(placeholder);
+        //             }
+        //             @Override
+        //             public void onLoadFailed(android.graphics.drawable.Drawable errorDrawable) {
+        //                 super.onLoadFailed(errorDrawable);
+        //                 rootView.setBackground(errorDrawable);
+        //             }
+        //         });
+        // }
+        // Явно устанавливаем фон из windowBackground текущей темы
+        final View rootView = findViewById(android.R.id.content);
+        android.util.TypedValue outValue = new android.util.TypedValue();
+        getTheme().resolveAttribute(android.R.attr.windowBackground, outValue, true);
+        rootView.setBackgroundResource(outValue.resourceId);
+
         apiService = ApiClient.getApiService();
         sharedPrefs = new SharedPrefs(this);
 
         setupViews();
         loadEventDetails();
-        loadRegisteredTeams();
 
         Button btnTeamLeaderboard = findViewById(R.id.btnTeamLeaderboard);
         btnTeamLeaderboard.setOnClickListener(v -> {
@@ -134,46 +164,6 @@ public class EventDetailsActivity extends BaseActivity {
     private void loadEventDetails() {
         // Здесь можно загрузить дополнительные детали мероприятия, если нужно
         // Пока используем данные, переданные из Intent
-    }
-
-    private void loadRegisteredTeams() {
-        String token = sharedPrefs.getToken();
-        if (token == null || token.isEmpty()) {
-            return;
-        }
-
-        apiService.getTeams("Bearer " + token).enqueue(new Callback<List<Team>>() {
-            @Override
-            public void onResponse(Call<List<Team>> call, Response<List<Team>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Team> allTeams = response.body();
-                    long registeredCount = 0;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        registeredCount = allTeams.stream()
-                                .filter(team -> team.getEventId() != null && team.getEventId().equals(event.getId()))
-                                .count();
-                    } else {
-                        for (Team team : allTeams) {
-                            if (team.getEventId() != null && team.getEventId().equals(event.getId())) {
-                                registeredCount++;
-                            }
-                        }
-                    }
-
-                    TextView tvTeamCount = findViewById(R.id.tvTeamCount);
-                    if (event.getMaxTeamLimit() > 0) {
-                        tvTeamCount.setText("Зарегистрировано: " + registeredCount + " / " + event.getMaxTeamLimit() + " команд");
-                    } else {
-                        tvTeamCount.setText("Зарегистрировано: " + registeredCount + " команд");
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Team>> call, Throwable t) {
-                // Handle failure
-            }
-        });
     }
 
     private void checkTeamAndRegister() {
@@ -259,11 +249,6 @@ public class EventDetailsActivity extends BaseActivity {
         ListView listViewMembers = dialogView.findViewById(R.id.listViewMembers);
         Button btnCancel = dialogView.findViewById(R.id.btnCancel);
         Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
-
-        // Устанавливаем лимит участников
-        tvMemberLimit.setText(getString(R.string.max_members_limit, event.getMaxTeamMembers()));
-
-        // Создаем адаптер для списка участников
         TeamMemberSelectionAdapter adapter = new TeamMemberSelectionAdapter(
             this, 
             team.getMembers(), 
@@ -441,7 +426,6 @@ public class EventDetailsActivity extends BaseActivity {
                                 Toast.makeText(EventDetailsActivity.this, "Регистрация отменена", Toast.LENGTH_SHORT).show();
                                 btnUnregister.setVisibility(View.GONE);
                                 btnRegister.setVisibility(View.VISIBLE);
-                                loadRegisteredTeams();
                             } else {
                                 Toast.makeText(EventDetailsActivity.this, "Ошибка отмены регистрации", Toast.LENGTH_SHORT).show();
                             }

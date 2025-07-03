@@ -17,6 +17,7 @@ import com.proj.quest.models.CreateEventRequest;
 import com.proj.quest.models.RiddleRequest;
 import com.proj.quest.models.ThemeUploadResponse;
 import com.proj.quest.models.EventProgress;
+import com.proj.quest.models.RegisteredTeamProgress;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -196,4 +197,7 @@ public interface ApiService {
         @Path("eventId") int eventId,
         @Query("finishTime") long finishTime
     );
+
+    @GET("api/events/{eventId}/teams-progress")
+    Call<List<RegisteredTeamProgress>> getEventTeamsProgress(@Header("Authorization") String token, @Path("eventId") int eventId);
 }

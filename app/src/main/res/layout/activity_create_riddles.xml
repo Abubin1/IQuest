@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="К предпросмотру"
+        android:text="Далее"
         android:textSize="18sp"/>
 
 </RelativeLayout> 

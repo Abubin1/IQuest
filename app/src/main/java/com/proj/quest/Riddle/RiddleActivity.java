@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -84,6 +85,8 @@ public class RiddleActivity extends BaseActivity {
     private String riddleStartTimeKey;
     private TextView tvNextEventTimer;
     private CountDownTimer nextEventCountDownTimer;
+    private boolean isPreviewMode = false;
+    private Button btnClosePreview;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -92,6 +95,7 @@ public class RiddleActivity extends BaseActivity {
 
         // Получаем themeUrl из Intent
         String themeUrl = getIntent().getStringExtra("EVENT_THEME_URL");
+        Log.d("RiddleActivity", "themeUrl from Intent = " + themeUrl);
         eventId = getIntent().getIntExtra("EVENT_ID", -1);
         eventTime = getIntent().getStringExtra("EVENT_TIME");
         boolean isRegistered = getIntent().getBooleanExtra("IS_REGISTERED", false);
@@ -110,6 +114,7 @@ public class RiddleActivity extends BaseActivity {
                     if (response.isSuccessful() && response.body() != null) {
                         for (com.proj.quest.models.Event event : response.body()) {
                             if (event.getId() == eventId && event.getThemeUrl() != null && !event.getThemeUrl().isEmpty()) {
+                                Log.d("RiddleActivity", "themeUrl from server = " + event.getThemeUrl());
                                 setThemeBackground(event.getThemeUrl());
                                 break;
                             }
@@ -137,6 +142,29 @@ public class RiddleActivity extends BaseActivity {
         riddleAdapter = new RiddleAdapter(this, riddleList);
         riddlesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         riddlesRecyclerView.setAdapter(riddleAdapter);
+
+        isPreviewMode = getIntent().getBooleanExtra("PREVIEW_MODE", false);
+        btnClosePreview = new Button(this);
+        btnClosePreview.setText("Закрыть предпросмотр");
+        btnClosePreview.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.yellow)));
+        btnClosePreview.setOnClickListener(v -> finish());
+        if (isPreviewMode) {
+            // Скрыть всё, кроме singleRiddleLayout
+            if (riddlesRecyclerView != null) riddlesRecyclerView.setVisibility(View.GONE);
+            if (timerTextView != null) timerTextView.setVisibility(View.GONE);
+            if (tvNotRegistered != null) tvNotRegistered.setVisibility(View.GONE);
+            if (tvNextEventTimer != null) tvNextEventTimer.setVisibility(View.GONE);
+            if (findViewById(R.id.bottom_navigation) != null) findViewById(R.id.bottom_navigation).setVisibility(View.GONE);
+            singleRiddleLayout.setVisibility(View.VISIBLE);
+            // Установить текст загадки
+            String riddleText = getIntent().getStringExtra("RIDDLE_TEXT");
+            tvRiddleNumber.setText("Загадка 1");
+            tvQuestion.setText(riddleText);
+            checkBtn.setVisibility(View.GONE);
+            tvResult.setVisibility(View.GONE);
+            // Добавить кнопку закрытия
+            ((LinearLayout) singleRiddleLayout).addView(btnClosePreview);
+        }
 
         if (!isRegistered || eventTime == null || isEventFinished) {
             // Если не зарегистрирован или мероприятие завершено — показываем сообщение
@@ -351,13 +379,13 @@ public class RiddleActivity extends BaseActivity {
     }
 
     private void showCurrentRiddle() {
+        // Если загадок нет или все загадки решены
         if (riddleList.isEmpty() || currentRiddleIndex >= riddleList.size()) {
-            tvRiddleNumber.setText("Все загадки решены!");
+            tvRiddleNumber.setText("Все загадки уже решены для этого мероприятия.");
             tvQuestion.setText("");
             checkBtn.setVisibility(View.GONE);
-            
             // Показываем кнопку завершения мероприятия для капитана
-            if (isCaptain) {
+            if (isCaptain && !riddleList.isEmpty()) {
                 checkBtn.setVisibility(View.VISIBLE);
                 checkBtn.setEnabled(true);
                 checkBtn.setText("Завершить мероприятие");
@@ -365,6 +393,8 @@ public class RiddleActivity extends BaseActivity {
             }
             return;
         }
+        // Если пользователь только записался на новое мероприятие, прогресс должен быть 0
+        if (currentRiddleIndex < 0) currentRiddleIndex = 0;
         RiddleRequest riddle = riddleList.get(currentRiddleIndex);
         tvRiddleNumber.setText("Загадка " + (currentRiddleIndex + 1));
         tvQuestion.setText(riddle.getRiddle_text());
@@ -479,17 +509,33 @@ public class RiddleActivity extends BaseActivity {
     }
 
     private void setThemeBackground(String themeUrl) {
-        final View rootView = findViewById(android.R.id.content);
-        Glide.with(this)
-            .load(themeUrl)
-            .into(new CustomTarget<Drawable>() {
-                @Override
-                public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
-                    rootView.setBackground(resource);
-                }
-                @Override
-                public void onLoadCleared(Drawable placeholder) {}
-            });
+        final RelativeLayout rootLayout = findViewById(R.id.riddleRootLayout);
+        if (themeUrl != null && !themeUrl.isEmpty()) {
+            String fullUrl = themeUrl.startsWith("http") ? themeUrl : com.proj.quest.api.ApiClient.BASE_URL + (themeUrl.startsWith("/") ? themeUrl.substring(1) : themeUrl);
+            Glide.with(this)
+                .load(fullUrl)
+                .placeholder(R.color.white)
+                .error(R.color.white)
+                .into(new com.bumptech.glide.request.target.CustomTarget<android.graphics.drawable.Drawable>() {
+                    @Override
+                    public void onResourceReady(android.graphics.drawable.Drawable resource, com.bumptech.glide.request.transition.Transition<? super android.graphics.drawable.Drawable> transition) {
+                        rootLayout.setBackground(resource);
+                    }
+                    @Override
+                    public void onLoadCleared(android.graphics.drawable.Drawable placeholder) {
+                        rootLayout.setBackground(placeholder);
+                    }
+                    @Override
+                    public void onLoadFailed(android.graphics.drawable.Drawable errorDrawable) {
+                        super.onLoadFailed(errorDrawable);
+                        rootLayout.setBackground(errorDrawable);
+                    }
+                });
+        } else {
+            android.util.TypedValue outValue = new android.util.TypedValue();
+            getTheme().resolveAttribute(android.R.attr.windowBackground, outValue, true);
+            rootLayout.setBackgroundResource(outValue.resourceId);
+        }
     }
 
     private void awardPoints() {

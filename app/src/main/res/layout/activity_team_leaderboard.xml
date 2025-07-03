@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/leaderboard_background">
+    android:background="@android:color/transparent">
 
     <LinearLayout
         android:id="@+id/leaderboardContent"
@@ -32,14 +32,6 @@
             android:paddingHorizontal="16dp">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Место"
-                android:textColor="@color/leaderboard_text"
-                android:textStyle="bold"
-                android:minWidth="48dp"/>
-
-            <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -52,10 +44,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="end"
-                android:text="Баллы"
+                android:text="Статус"
                 android:textColor="@color/leaderboard_text"
                 android:textStyle="bold"
-                android:minWidth="64dp"/>
+                android:minWidth="100dp"/>
         </LinearLayout>
 
         <ListView
