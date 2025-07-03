@@ -15,6 +15,7 @@ import com.proj.quest.Group.CreateGroupActivity;
 import com.proj.quest.Group.GroupActivity;
 import com.proj.quest.R;
 import com.proj.quest.Riddle.RiddleActivity;
+import com.proj.quest.Theme.BaseActivity;
 import com.proj.quest.leaderboard.LeaderboardActivity;
 import com.proj.quest.api.ApiClient;
 import com.proj.quest.api.ApiService;
@@ -22,7 +23,7 @@ import com.proj.quest.models.Event;
 import com.proj.quest.models.Team;
 import com.proj.quest.utils.SharedPrefs;
 
-public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     private BottomNavigationView bottomNavigationView;
     private Button createEvent;
 

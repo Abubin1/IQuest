@@ -67,6 +67,7 @@
 
     <Button
         android:id="@+id/btnOpenMap"
+        android:backgroundTint="?attr/colorButtonNormal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Выбрать на карте"

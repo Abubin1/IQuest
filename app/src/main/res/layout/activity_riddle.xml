@@ -102,6 +102,7 @@
             android:visibility="invisible" />
 
         <Button
+            android:backgroundTint="?attr/colorButtonNormal"
             android:id="@+id/checkBtn"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
@@ -112,6 +113,7 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
+        style="@style/BottomNavStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

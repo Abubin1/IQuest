@@ -46,12 +46,12 @@
         android:inputType="textPassword"/>
 
     <com.google.android.material.button.MaterialButton
+        android:backgroundTint="?attr/colorButtonNormal"
         android:id="@+id/btnRegister"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_gravity="center"
-        android:backgroundTint="@color/blue"
         android:textColor="@color/white"
         style="@style/Widget.MaterialComponents.Button"
         android:text="Зарегистрироваться"/>

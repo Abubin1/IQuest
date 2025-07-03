@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 
 import com.proj.quest.R;
+import com.proj.quest.Theme.BaseActivity;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.util.GeoPoint;
@@ -21,7 +22,7 @@ import org.osmdroid.api.IMapController;
 
 import java.util.ArrayList;
 
-public class MapPickerActivity extends AppCompatActivity {
+public class MapPickerActivity extends BaseActivity {
 
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private MapView map = null;

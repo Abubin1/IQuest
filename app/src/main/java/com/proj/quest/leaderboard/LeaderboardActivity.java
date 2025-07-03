@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.proj.quest.Theme.BaseActivity;
 import com.proj.quest.ui.main.MainActivity;
 import com.proj.quest.R;
 import com.proj.quest.ui.main.ProfileActivity;
@@ -23,7 +24,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LeaderboardActivity extends AppCompatActivity {
+public class LeaderboardActivity extends BaseActivity {
 
     private Handler handler = new Handler();
     private Runnable leaderboardUpdater;
